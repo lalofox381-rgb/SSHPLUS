@@ -9,6 +9,7 @@
 #===================================================
 [[ ! -d /etc/SSHPlus ]] && exit 0
 [[ ! -d /etc/bot ]] && exit 0
+cd /etc/SSHPlus
 source ShellBot.sh
 api_bot=$1
 id_admin=$2
