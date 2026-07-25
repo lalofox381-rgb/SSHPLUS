@@ -198,7 +198,7 @@ function autoexec () {
       echo ""
       fun_bar 'autmenu'
       echo ""
-      echo -e "${verde}AUTO EXECUCION ACTIVADO!\e[0m"
+      echo -e "${verde}AUTO EJECUCION ACTIVADO!\e[0m"
       sleep 1.5s
       menu2
    fi

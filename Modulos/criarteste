@@ -37,7 +37,7 @@ fi
 if [ -f $file_pass ]; then
 	    echo
 	    else
-	     touch $file_passw
+	     touch $file_pass
        chmod 755 $file_pass
 fi
 if [ -f $file_client ]; then
@@ -55,11 +55,11 @@ dpkg-reconfigure --frontend noninteractive tzdata > /dev/null 2>&1
 msg () {
 echo -e "$bar1"
     echo -e "${rojo}#########################################${cierre}"
-    echo -e "${rojo}#    ${verde}Bienvenido${blanco}, Gracias por utilizar Onlycode ${verdeR}VPN     ${rojo}# ${cierre}"
+    echo -e "${rojo}#    ${verde}Bienvenido${blanco}, Gracias por utilizar ${verdeR}@Netxxus     ${rojo}# ${cierre}"
     echo -e "${rojo}#    ${blanco}Este SCRIPT autoriza su TOKEN ID para usar${cierre}        ${rojo}# ${cierre}"
     echo -e "${rojo}#    ${blanco}Nuestra apk...                            ${cierre}        ${rojo}# ${cierre}"
     echo -e "${rojo}#   ${melon}-----------------------------------------------    ${rojo}#${cierre}"
-    echo -e "${rojo}#          ${blanco}dev: ${moradoL}@dankelthaher ${blanco}- ${amarillo}Onlycode ${verdeR}VPN${cierre}           ${rojo}#${cierre}"
+    echo -e "${rojo}#          ${blanco}dev: ${moradoL}@Netxxus ${blanco}- ${amarillo}${verdeR}@Netxxus${cierre}           ${rojo}#${cierre}"
     echo -e "${rojo}############################################${cierre}"
     echo -e "$bar1"
 }
@@ -76,7 +76,7 @@ echo -e "$bar1"
 #FUNCION DE CREACION DE USUARIOS
 crear () {
     clear
-    TITLE="${blanco}Onlycode ${verdeR}VPN"
+    TITLE="${blanco}${verdeR}@Netxxus"
 echo -e "$TITLE"
 echo -e ""
 echo -e " AUTORIZAR TOKEN ID"
@@ -135,7 +135,7 @@ echo -e "\e[32m  Caducidad de la cuenta: \e[0m"$Expiration_Display
 echo -e ""
 echo -e "$bar1"
 echo -e "\e[32m  Host/IP: \e[0m"$IPADDR
-echo -e "\e[32m  Perto OpenSSH: \e[0m"$opensshport
+echo -e "\e[32m  Puerto OpenSSH: \e[0m"$opensshport
 echo -e "\e[32m  Puerto Dropbear: \e[0m"$dropbearport
 echo -e "\e[32m  Puerto SSL: \e[0m"$stunnel4port
 echo -e "\e[32m  Puertos Squid: \e[0m"$squidport
@@ -224,7 +224,7 @@ usermod -e $Expiration $token
 egrep "^$token" /etc/passwd >/dev/null
 echo -e "$PASSWDT\n$PASSWDT\n"|passwd $token &> /dev/null
 clear
-echo -e "$TILTE"
+echo -e "$TITLE"
 echo -e "$bar1"
 echo -e ""
 echo -e " token ID: $token"
@@ -235,7 +235,7 @@ echo -e " La cuenta vence el: $Expiration_Display"
 echo -e "$bar1"
 else
 clear
-echo -e "$TILTE"
+echo -e "$TITLE"
 echo -e "$bar1"
 echo -e ""
 echo -e " El Token que ingresaste no existe"
@@ -254,7 +254,7 @@ else
 	UIDN=500
 fi
 clear
-echo -e "$TILTE"
+echo -e "$TITLE"
 echo -e "$bar1"
 echo -e ""
 echo -e " TOKEN ID               Expiracion"
@@ -312,7 +312,7 @@ informacion_clientes () {
 }
 online (){                                                               
 clear
-TITLE="${blanco}Onlycode ${verdeR}VPN"
+TITLE="${blanco}${verdeR}@Netxxus"
 
 if [ -e "/var/log/auth.log" ]; then
         LOG="/var/log/auth.log";
@@ -377,7 +377,7 @@ No_token="$(cat /etc/token/BD | wc -l)"
 #MENU DE USUARIOS
 menu () {
   clear
-echo -e "${melon}               == Token Auth == (${amarillo}onlycode${cierre}${melon})
+echo -e "${melon}               == Token Auth == (${amarillo}@Netxxus${cierre}${melon})
 ${bar1}
 ${morado}TOTAL DE REGISTROS: ${rojo}>${cierre} ${azul}TOKEN: ${blanco}$No_token  ${cierre}
 ${bar3}

@@ -27,7 +27,7 @@ fin="\e[0m"   # fin del color
 			touch $HOME/fim
 		) >/dev/null 2>&1 &
 		tput civis
-		echo -ne "${amarillo}AGUARDE ${blanco}- ${amarillo}["
+		echo -ne "${amarillo}ESPERE ${blanco}- ${amarillo}["
 		while true; do
 			for ((i = 0; i < 18; i++)); do
 				echo -ne "${rojo}#"
@@ -38,7 +38,7 @@ fin="\e[0m"   # fin del color
 			sleep 1s
 			tput cuu1
 			tput dl1
-			echo -ne "${amarillo}AGUARDE ${blanco}- ${amarillo}["
+			echo -ne "${amarillo}ESPERE ${blanco}- ${amarillo}["
 		done
 		echo -e "${amarillo}]${blanco} -${verde} OK !${blanco}"
 		tput cnorm
@@ -50,7 +50,7 @@ fin="\e[0m"   # fin del color
 		for pton in $(echo -e "$PT" | cut -d: -f2 | cut -d' ' -f1 | uniq); do
 			svcs=$(echo -e "$PT" | grep -w "$pton" | awk '{print $1}' | uniq)
 			[[ "$porta" = "$pton" ]] && {
-				echo -e "\n${rojo}PORTA ${amarillo}$porta ${rojo}EM USO PELO ${blanco}$svcs${fin}"
+				echo -e "\n${rojo}PORTA ${amarillo}$porta ${rojo}EN USO PELO ${blanco}$svcs${fin}"
 				sleep 3
 				fun_conexao
 			}
@@ -92,12 +92,12 @@ fin="\e[0m"   # fin del color
 					}
 				}
 				fun_bar 'rem_sqd'
-				echo -e "\n${verde}SQUID REMOVIDO CON SUCESSO !${fin}"
+				echo -e "\n${verde}SQUID REMOVIDO CON EXITO !${fin}"
 				sleep 2
 				clear
 				fun_conexao
 			} || {
-				echo -e "\n${rojo}Retornando...${fin}"
+				echo -e "\n${rojo}Volviendo...${fin}"
 				sleep 2
 				clear
 				fun_conexao
@@ -134,13 +134,13 @@ fin="\e[0m"   # fin del color
 				echo -e "\n${rojo}[${cyan}1${rojo}] ${blanco}• ${amarillo}SQUID VERSAO 3.3.X\n${rojo}[${cyan}2${rojo}] ${blanco}• ${amarillo}SQUID VERSAO 3.5.X${fin}\n"
 				read -p "$(echo -e "${verde}INFORME UNA OPCION ${blanco}: ")" -e -i 1 opc
 				[[ -z "$opc" ]] && {
-					echo -e "\n${rojo}Opcao invalida!"
+					echo -e "\n${rojo}Opcion invalida!"
 					sleep 2
 					fun_conexao
 				}
 				[[ "$opc" != '1' ]] && {
 					[[ "$opc" != '2' ]] && {
-						echo -e "\n${rojo}Opcao invalida !"
+						echo -e "\n${rojo}Opcion invalida !"
 						sleep 2
 						fun_conexao
 					}
@@ -223,7 +223,7 @@ fin="\e[0m"   # fin del color
 			var_sqd="/etc/squid3/squid.conf"
 		else
 			echo -e "\n${rojo}SQUID NO ESTA INSTALADO!${fin}"
-			echo -e "\n${rojo}Retornando...${fin}"
+			echo -e "\n${rojo}Volviendo...${fin}"
 			sleep 2
 			clear
 			fun_squid
@@ -252,14 +252,14 @@ fin="\e[0m"   # fin del color
 
 	rempt_sqd() {
 		echo -e "\E[41;1;37m        REMOVER PORTA DO SQUID        ${fin}"
-		echo -e "\n${amarillo}PORTAS EM USO: ${verde}$sqdp\n"
+		echo -e "\n${amarillo}PUERTOS EN USO: ${verde}$sqdp\n"
 		if [[ -f "/etc/squid/squid.conf" ]]; then
 			var_sqd="/etc/squid/squid.conf"
 		elif [[ -f "/etc/squid3/squid.conf" ]]; then
 			var_sqd="/etc/squid3/squid.conf"
 		else
 			echo -e "\n${rojo}SQUID NAO ESTA INSTALADO!${fin}"
-			echo -e "\n${rojo}Retornando...${fin}"
+			echo -e "\n${rojo}Volviendo...${fin}"
 			sleep 2
 			clear
 			fun_squid
@@ -297,7 +297,7 @@ fin="\e[0m"   # fin del color
 		echo -e "\E[44;1;37m          GERENCIAR SQUID PROXY           ${fin}"
 		[[ "$(netstat -nplt | grep -c 'squid')" != "0" ]] && {
 			sqdp=$(netstat -nplt | grep 'squid' | awk -F ":" {'print $4'} | xargs)
-			echo -e "\n${amarillo}PORTAS${blanco}: ${verde}$sqdp"
+			echo -e "\n${amarillo}PUERTOS${blanco}: ${verde}$sqdp"
 			VarSqdOn="REMOVER SQUID PROXY"
 		} || {
 			VarSqdOn="INSTALAR SQUID PROXY"
@@ -305,9 +305,9 @@ fin="\e[0m"   # fin del color
 		echo -e "\n${rojo}[${cyan}1${rojo}] ${blanco}• ${amarillo}$VarSqdOn ${rojo}
 [${cyan}2${rojo}] ${blanco}• ${amarillo}ADICIONAR PORTA ${rojo}
 [${cyan}3${rojo}] ${blanco}• ${amarillo}REMOVER PORTA${rojo}
-[${cyan}0${rojo}] ${blanco}• ${amarillo}VOLTAR${fin}"
+[${cyan}0${rojo}] ${blanco}• ${amarillo}VOLVER${fin}"
 		echo ""
-		echo -ne "${verde}OQUE DESEJA FAZER ${amarillo}?${rojo}?${blanco} "
+		echo -ne "${verde}QUE DESEA HACER ${amarillo}?${rojo}?${blanco} "
 		read x
 		clear
 		case $x in
@@ -321,12 +321,12 @@ fin="\e[0m"   # fin del color
 			rempt_sqd
 			;;
 		0 | 00)
-			echo -e "${rojo}Retornando...${fin}"
+			echo -e "${rojo}Volviendo...${fin}"
 			sleep 1
 			fun_conexao
 			;;
 		*)
-			echo -e "${rojo}Opcao Invalida...${fin}"
+			echo -e "${rojo}Opcion Invalida...${fin}"
 			sleep 2
 			fun_conexao
 			;;
@@ -343,7 +343,7 @@ fin="\e[0m"   # fin del color
 				stats='${rojo}○ '
 			fi
 			echo -e "\E[44;1;37m              MENU DROPBEAR               ${fin}"
-			echo -e "\n${amarillo}PORTAS${blanco}: ${verde}$dpbr"
+			echo -e "\n${amarillo}PUERTOS${blanco}: ${verde}$dpbr"
 			echo ""
 			echo -e "${rojo}[${cyan}1${rojo}] ${blanco}• ${amarillo}LIMITER DROPBEAR $stats${fin}"
 			echo -e "${rojo}[${cyan}2${rojo}] ${blanco}• ${amarillo}EDITAR PUERTO DROPBEAR${fin}"
@@ -409,11 +409,11 @@ fin="\e[0m"   # fin del color
 				clear
 				fun_conexao
 			elif [[ "$resposta" = '0' ]]; then
-				echo -e "\n${rojo}Retornando...${fin}"
+				echo -e "\n${rojo}Volviendo...${fin}"
 				sleep 2
 				fun_conexao
 			else
-				echo -e "\n${rojo}Opcao invalida...${fin}"
+				echo -e "\n${rojo}Opcion invalida...${fin}"
 				sleep 2
 				fun_conexao
 			fi
@@ -469,7 +469,7 @@ fin="\e[0m"   # fin del color
 				fun_conexao
 			} || {
 				echo""
-				echo -e "${rojo}Retornando...${fin}"
+				echo -e "${rojo}Volviendo...${fin}"
 				sleep 3
 				clear
 				fun_conexao
@@ -488,7 +488,7 @@ fin="\e[0m"   # fin del color
 			echo -ne "${GREEN}DESEJA CONTINUAR A REINSTALAÇÃO ? ${YELLOW}[s/n]:${SCOLOR} "
 			read resp
 			[[ "$resp" != @(s|sim|S|SIM) ]] && {
-				echo -e "\n${RED}Retornando...${SCOLOR}"
+				echo -e "\n${RED}Volviendo...${SCOLOR}"
 				sleep 2
 				conexao
 			}
@@ -499,7 +499,7 @@ fin="\e[0m"   # fin del color
 			echo -ne "${GREEN}DESEA CONTINUAR LA INSTALACION ? ${YELLOW}[s/n]:${SCOLOR} "
 			read resp
 			[[ "$resp" != @(s|sim|S|SIM) ]] && {
-				echo -e "\n${RED}Retornando...${SCOLOR}"
+				echo -e "\n${RED}Volviendo...${SCOLOR}"
 				sleep 2
 				conexao
 			}
@@ -525,9 +525,9 @@ fin="\e[0m"   # fin del color
 		echo ""
 		echo -e "${rojo}[${cyan}1${rojo}] ${blanco}• ${amarillo}ACTIVAR CHISEL $chiselsts ${fin}"
 		echo -e "${rojo}[${cyan}2${rojo}] ${blanco}• ${amarillo}REINICIAR CHISEL${fin}"
-		echo -e "${rojo}[${cyan}0${rojo}] ${blanco}• ${amarillo}VOLTAR${fin}"
+		echo -e "${rojo}[${cyan}0${rojo}] ${blanco}• ${amarillo}VOLVER${fin}"
 		echo ""
-		echo -ne "${verde}OQUE DESEJA FAZER ${amarillo}?${blanco} "
+		echo -ne "${verde}QUE DESEA HACER ${amarillo}?${blanco} "
 		read resposta
 		if [[ "$resposta" = '1' ]]; then
 			if netstat -nltp | grep 'docker' 1>/dev/null 2>/dev/null; then
@@ -545,7 +545,7 @@ fin="\e[0m"   # fin del color
 				echo ""
 				fun_bar 'fun_chiseloff'
 				echo ""
-				echo -e "${verde}CHISEL DESACTIVADO CON SUCESSO!${amarillo}"
+				echo -e "${verde}CHISEL DESACTIVADO CON EXITO!${amarillo}"
 				sleep 3
 				fun_chisel
 			else
@@ -560,7 +560,7 @@ fin="\e[0m"   # fin del color
 				echo -ne "${GREEN}DESEJA CONTINUAR A INSTALACAO ? ${YELLOW}[s/n]:${SCOLOR} "
 				read resp
 				[[ "$resp" != @(s|sim|S|SIM) ]] && {
-					echo -e "\n${RED}Retornando...${SCOLOR}"
+					echo -e "\n${RED}Volviendo...${SCOLOR}"
 					sleep 2
 					conexao
 				}
@@ -644,12 +644,12 @@ fin="\e[0m"   # fin del color
 			fun_chisel
 		elif [[ "$resposta" = '0' ]]; then
 			echo ""
-			echo -e "${rojo}Retornando...${fin}"
+			echo -e "${rojo}Volviendo...${fin}"
 			sleep 1
 			fun_conexao
 		else
 			echo ""
-			echo -e "${rojo}Opcao invalida !${fin}"
+			echo -e "${rojo}Opcion invalida !${fin}"
 			sleep 1
 			fun_socks
 		fi
@@ -658,13 +658,13 @@ fin="\e[0m"   # fin del color
 		if netstat -nltp | grep 'stunnel4' 1>/dev/null 2>/dev/null; then
 			[[ $(netstat -nltp | grep 'stunnel4' | wc -l) != '0' ]] && sslt=$(netstat -nplt | grep stunnel4 | awk {'print $4'} | awk -F ":" {'print $2'} | xargs) || sslt="${rojo}INDISPONIVEL"
 			echo -e "\E[44;1;37m              MENU SSL TUNNEL               ${fin}"
-			echo -e "\n${amarillo}PORTAS${blanco}: ${verde}$sslt"
+			echo -e "\n${amarillo}PUERTOS${blanco}: ${verde}$sslt"
 			echo ""
 			echo -e "${rojo}[${cyan}1${rojo}] ${blanco}• ${amarillo}ALTERAR PORTA SSL TUNNEL${fin}"
 			echo -e "${rojo}[${cyan}2${rojo}] ${blanco}• ${amarillo}REMOVER SSL TUNNEL${fin}"
-			echo -e "${rojo}[${cyan}0${rojo}] ${blanco}• ${amarillo}VOLTAR${fin}"
+			echo -e "${rojo}[${cyan}0${rojo}] ${blanco}• ${amarillo}VOLVER${fin}"
 			echo ""
-			echo -ne "${verde}OQUE DESEJA FAZER ${amarillo}?${blanco} "
+			echo -ne "${verde}QUE DESEA HACER ${amarillo}?${blanco} "
 			read resposta
 			echo ""
 			[[ "$resposta" = '1' ]] && {
@@ -718,9 +718,9 @@ fin="\e[0m"   # fin del color
 			echo ""
 			echo -e "${rojo}[${cyan}1${rojo}] ${blanco}• ${amarillo}INSTALAR SSL TUNNEL PADRÃO${fin}"
 			echo -e "${rojo}[${cyan}2${rojo}] ${blanco}• ${amarillo}INSTALAR SSL TUNNEL WEBSOCKET${fin}"
-			echo -e "${rojo}[${cyan}0${rojo}] ${blanco}• ${amarillo}VOLTAR${fin}"
+			echo -e "${rojo}[${cyan}0${rojo}] ${blanco}• ${amarillo}VOLVER${fin}"
 			echo ""
-			echo -ne "${verde}OQUE DESEJA FAZER ${amarillo}?${blanco} "
+			echo -ne "${verde}QUE DESEA HACER ${amarillo}?${blanco} "
 			read resposta
 			echo ""
 			if [[ "$resposta" = '1' ]]; then
@@ -728,12 +728,12 @@ fin="\e[0m"   # fin del color
 			elif [[ "$resposta" = '2' ]]; then
 				portssl='80'
 			elif [[ "$resposta" = '0' ]]; then
-				echo -e "${rojo}Retornando...${fin}"
+				echo -e "${rojo}Volviendo...${fin}"
 				sleep 3
 				fun_conexao
 			else
 				echo ""
-				echo -e "${rojo}Opcao invalida !${fin}"
+				echo -e "${rojo}Opcion invalida !${fin}"
 				sleep 1
 				inst_ssl
 			fi
@@ -814,7 +814,7 @@ fin="\e[0m"   # fin del color
 				sleep 2
 				fun_conexao
 			} || {
-				echo -e "\n${rojo}Retornando...${fin}"
+				echo -e "\n${rojo}Volviendo...${fin}"
 				sleep 2
 				clear
 				fun_conexao
@@ -885,7 +885,7 @@ unzip ddos.zip
 				echo ""
 				fun_bar 'fun_socksoff'
 				echo ""
-				echo -e "${verde}PROXY SOCKS DESACTIVADO CON SUCESSO!${amarillo}"
+				echo -e "${verde}PROXY SOCKS DESACTIVADO CON EXITO!${amarillo}"
 				sleep 3
 				fun_socks
 			else
@@ -917,7 +917,7 @@ unzip ddos.zip
 				echo ""
 				fun_bar 'fun_inisocks'
 				echo ""
-				echo -e "${verde}SOCKS ATIVADO CON SUCESSO${amarillo}"
+				echo -e "${verde}SOCKS ATIVADO CON EXITO${amarillo}"
 				sleep 3
 				fun_socks
 			fi
@@ -940,7 +940,7 @@ unzip ddos.zip
 				echo ""
 				fun_bar 'fun_wssocksoff'
 				echo ""
-				echo -e "${verde}WEBSOCKET DESACTIVADO CON SUCESSO!${amarillo}"
+				echo -e "${verde}WEBSOCKET DESACTIVADO CON EXITO!${amarillo}"
 				sleep 3
 				fun_socks
 			else
@@ -972,7 +972,7 @@ unzip ddos.zip
 				echo ""
 				fun_bar 'fun_iniwssocks'
 				echo ""
-				echo -e "\e[1;32WS SOCKS ATIVADO CON SUCESSO${amarillo}"
+				echo -e "\e[1;32WS SOCKS ATIVADO CON EXITO${amarillo}"
 				sleep 3
 				fun_socks
 			fi
@@ -995,7 +995,7 @@ unzip ddos.zip
 				echo ""
 				fun_bar 'fun_socksopenoff'
 				echo ""
-				echo -e "${verde}SOCKS DESATIVADO CON SUCESSO!${amarillo}"
+				echo -e "${verde}SOCKS DESATIVADO CON EXITO!${amarillo}"
 				sleep 2
 				fun_socks
 			else
@@ -1064,7 +1064,7 @@ unzip ddos.zip
 				}
 				fun_bar 'abrirptsks'
 				echo ""
-				echo -e "${verde}PROXY SOCKS ATIVADO CON SUCESSO${amarillo}"
+				echo -e "${verde}PROXY SOCKS ATIVADO CON EXITO${amarillo}"
 				sleep 2
 				fun_socks
 			else
@@ -1159,7 +1159,7 @@ unzip ddos.zip
 				echo ""
 				fun_bar 'restartsocks'
 				echo ""
-				echo -e "${verde}STATUS ALTERADO CON SUCESSO!"
+				echo -e "${verde}STATUS ALTERADO CON EXITO!"
 				sleep 2
 				fun_socks
 			else
@@ -1265,12 +1265,12 @@ unzip ddos.zip
 			fi
 		elif [[ "$resposta" = '0' ]]; then
 			echo ""
-			echo -e "${rojo}Retornando...${fin}"
+			echo -e "${rojo}Volviendo...${fin}"
 			sleep 1
 			fun_conexao
 		else
 			echo ""
-			echo -e "${rojo}Opcao invalida !${fin}"
+			echo -e "${rojo}Opcion invalida !${fin}"
 			sleep 1
 			fun_socks
 		fi
@@ -1282,9 +1282,9 @@ unzip ddos.zip
 		echo -e "\E[44;1;37m            OPENSSH             ${fin}\n"
 		echo -e "${rojo}[${cyan}1${rojo}] ${blanco}• ${amarillo}ADICIONAR PORTA${rojo}
 [${cyan}2${rojo}] ${blanco}• ${amarillo}REMOVER PORTA${rojo}
-[${cyan}3${rojo}] ${blanco}• ${amarillo}VOLTAR${fin}"
+[${cyan}3${rojo}] ${blanco}• ${amarillo}VOLVER${fin}"
 		echo ""
-		echo -ne "${verde}OQUE DESEJA FAZER ${amarillo}?${blanco} "
+		echo -ne "${verde}QUE DESEA HACER ${amarillo}?${blanco} "
 		read resp
 		if [[ "$resp" = '1' ]]; then
 			clear
@@ -1311,7 +1311,7 @@ unzip ddos.zip
 			clear
 			echo -e "\E[41;1;37m         REMOVER PORTA DO SSH         ${fin}"
 			echo -e "\n${amarillo}[${rojo}!${amarillo}] ${verde}PORTA PADRAO ${blanco}22 ${amarillo}CUIDADO !${fin}"
-			echo -e "\n${amarillo}PORTAS EM USO: ${blanco}$(grep 'Port' /etc/ssh/sshd_config | cut -d' ' -f2 | grep -v 'no' | xargs)\n"
+			echo -e "\n${amarillo}PUERTOS EN USO: ${blanco}$(grep 'Port' /etc/ssh/sshd_config | cut -d' ' -f2 | grep -v 'no' | xargs)\n"
 			echo -ne "${verde}QUAL PORTA DESEJA REMOVER ${amarillo}?${blanco} "
 			read pt
 			[[ -z "$pt" ]] && {
@@ -1340,7 +1340,7 @@ unzip ddos.zip
 			sleep 2
 			fun_conexao
 		else
-			echo -e "\n${rojo}Opcao invalida!"
+			echo -e "\n${rojo}Opcion invalida!"
 			sleep 2
 			fun_conexao
 		fi
