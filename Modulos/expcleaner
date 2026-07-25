@@ -20,7 +20,7 @@ chown nobody:$GROUPNAME /etc/openvpn/crl.pem
 echo -e "\E[44;1;37m Usuario          Fecha         Estado         Axion   \E[0m"
 echo ""
 for user in $(awk -F: '{print $1}' /etc/passwd); do
-	expdate=$(chage -l $user|awk -F: '/Account expires/{print $2}')
+	expdate=$(LC_ALL=C chage -l $user|awk -F: '/Account expires/{print $2}')
 	echo $expdate|grep -q never && continue
 	datanormal=$(date -d"$expdate" '+%d/%m/%Y')
 	tput setaf 3 ; tput bold ; printf '%-15s%-17s%s' $user $datanormal ; tput sgr0

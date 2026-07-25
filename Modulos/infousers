@@ -15,14 +15,14 @@ if [[ -e "/etc/SSHPlus/senha/$users" ]]; then
 else
     senha="Null"
 fi
-datauser=$(chage -l $users 2>/dev/null | grep -iE "account|cuenta|expira" | head -1 | awk -F: '{print $2}' | sed 's/^ //')
-if [[ -z "$datauser" || "$datauser" == " never" || "$datauser" == " nunca" || "$datauser" == " nunca" ]] 2> /dev/null
+datauser=$(LC_ALL=C chage -l $users 2>/dev/null | grep -i "Account expires" | head -1 | awk -F: '{print $2}' | sed 's/^ //')
+if [[ -z "$datauser" || "$datauser" == " never" || "$datauser" == " nunca" ]] 2> /dev/null
 then
 data="\033[1;33mNunca\033[0m"
 else
     databr="$(date -d "$datauser" +"%Y%m%d" 2>/dev/null)"
     hoje="$(date -d today +"%Y%m%d")"
-    if [[ -z "$databr" || "$hoje" -gt "$databr" ]] 2>/dev/null
+    if [[ -z "$databr" ]] || [[ "$hoje" -gt "$databr" ]] 2>/dev/null
     then
     data="\033[1;31mVencio\033[0m"
     else

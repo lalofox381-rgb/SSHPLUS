@@ -456,7 +456,7 @@ ver_users() {
                 info='===========================\n'
                 [[ -e /etc/SSHPlus/senha/$user ]] && senha=$(cat /etc/SSHPlus/senha/$user) || senha='Null'
                 [[ $(grep -wc $user $HOME/usuarios.db) != '0' ]] && limite=$(grep -w $user $HOME/usuarios.db | cut -d' ' -f2) || limite='Null'
-                datauser=$(chage -l $user | grep -i co | awk -F : '{print $2}')
+                datauser=$(LC_ALL=C chage -l $user | grep -i co | awk -F : '{print $2}')
                 [[ $datauser = ' never' ]] && {
                     data="00/00/00"
                 } || {
@@ -508,7 +508,7 @@ ver_users() {
                 info='===========================\n'
                 [[ -e /etc/SSHPlus/senha/$user ]] && senha=$(cat /etc/SSHPlus/senha/$user) || senha='Null'
                 [[ $(grep -wc $user $HOME/usuarios.db) != '0' ]] && limite=$(grep -w $user $HOME/usuarios.db | cut -d' ' -f2) || limite='Null'
-                datauser=$(chage -l $user | grep -i co | awk -F : '{print $2}')
+                datauser=$(LC_ALL=C chage -l $user | grep -i co | awk -F : '{print $2}')
                 [[ $datauser = ' never' ]] && {
                     data="00/00/00"
                 } || {
@@ -998,7 +998,7 @@ fun_exp_user() {
         }
         datenow=$(date +%s)
         for user in $(cat /etc/passwd | awk -F : '$3 >= 1000 {print $1}' | grep -v nobody); do
-            expdate=$(chage -l $user | awk -F: '/Account expires/{print $2}')
+            expdate=$(LC_ALL=C chage -l $user | awk -F: '/Account expires/{print $2}')
             echo $expdate | grep -q never && continue
             datanormal=$(date -d"$expdate" '+%d/%m/%Y')
             expsec=$(date +%s --date="$expdate")
@@ -1033,7 +1033,7 @@ fun_exp_user() {
         datenow=$(date +%s)
         dir_user="/etc/bot/revenda/${callback_query_from_username}/usuarios"
         for user in $(ls $dir_user); do
-            expdate=$(chage -l $user | awk -F: '/Account expires/{print $2}')
+            expdate=$(LC_ALL=C chage -l $user | awk -F: '/Account expires/{print $2}')
             echo $expdate | grep -q never && continue
             datanormal=$(date -d"$expdate" '+%d/%m/%Y')
             expsec=$(date +%s --date="$expdate")

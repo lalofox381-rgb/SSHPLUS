@@ -264,7 +264,7 @@ do
         Spacer=""
         Account="$(echo $Checklist | cut -d: -f1)"
         ID="$(echo $Checklist | grep -v nobody | cut -d: -f3)"
-        Exp="$(chage -l $Account | grep "Account expires" | awk -F": " '{print $2}')"
+        Exp="$(LC_ALL=C chage -l $Account | grep "Account expires" | awk -F": " '{print $2}')" 
         if [[ $ID -ge $UIDN ]]; then
         echo -e " $Account   " "   $Exp"
         fi
