@@ -22,7 +22,7 @@ data="\033[1;33mNunca\033[0m"
 else
     databr="$(date -d "$datauser" +"%Y%m%d" 2>/dev/null)"
     hoje="$(date -d today +"%Y%m%d")"
-    if [[ -z "$databr" || "$hoje" -ge "$databr" ]] 2>/dev/null
+    if [[ -z "$databr" || "$hoje" -gt "$databr" ]] 2>/dev/null
     then
     data="\033[1;31mVencio\033[0m"
     else

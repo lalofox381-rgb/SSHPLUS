@@ -20,7 +20,7 @@ while read user; do
 	else
 		databr="$(date -d "$expire" +"%Y%m%d")"
 		hoje="$(date -d today +"%Y%m%d")"
-		if [ $hoje -ge $databr ]
+		if [ $hoje -gt $databr ]
 		then
 			_user=$(echo -e "\033[1;31m[\033[1;36m$i\033[1;31m] \033[1;37m- \033[1;32m$user\033[1;37m")
 			datanormal="$(echo -e "\033[1;31m$(date -d"$expire" '+%d/%m/%Y')")"
