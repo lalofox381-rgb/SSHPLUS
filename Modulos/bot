@@ -63,6 +63,129 @@ fun_menu() {
     fi
 }
 
+# ========== VERSION & UPDATE FUNCTIONS ==========
+fun_version() {
+    VERSION_FILE="/etc/SSHPlus/.version"
+    if [[ -f "$VERSION_FILE" ]]; then
+        version=$(cat "$VERSION_FILE")
+    else
+        version="0.0.0"
+    fi
+    
+    local env_msg
+    env_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    env_msg+="<b>VERSION INSTALADA</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    env_msg+="🔄 <b>Version:</b> <code>${version}</code>\n"
+    env_msg+="📅 <b>Fecha:</b> <code>$(date '+%Y-%m-%d %H:%M')</code>\n"
+    env_msg+="🖥️ <b>Servidor:</b> <code>$(hostname)</code>\n\n"
+    
+    # Check remote version
+    remote=$(curl -s "https://raw.githubusercontent.com/Netxxus/SSHPLUS/main/VERSION" 2>/dev/null | head -1)
+    if [[ -n "$remote" && "$remote" != "$version" ]]; then
+        env_msg+="⚠️ <b>Nueva version disponible:</b> <code>${remote}</code>\n"
+        env_msg+="💡 Use /update para actualizar\n"
+    else
+        env_msg+="✅ <b>Sistema actualizado</b>\n"
+    fi
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$env_msg")" \
+        --parse_mode html
+    return 0
+}
+
+fun_update() {
+    # SOLO EL OWNER PUEDE ACTUALIZAR
+    [[ "${message_from_id[$id]}" != "$id_admin" ]] && {
+        ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+            --text "$(echo -e "🚫 <b>ACCESO DENEGADO</b>\n\nSolo el propietario puede ejecutar actualizaciones.")" \
+            --parse_mode html
+        return 0
+    }
+    
+    GITHUB_RAW="https://raw.githubusercontent.com/Netxxus/SSHPLUS/main"
+    
+    local env_msg
+    env_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    env_msg+="<b>ACTUALIZANDO SCRIPTS...</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    env_msg+="⏳ <i>Descargando nuevos archivos...</i>\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$env_msg")" \
+        --parse_mode html
+    
+    # Modules list
+    modules=(menu criarusuario remover monitor sshmonitor mudardata alterarlimite alterarsenha \
+             expcleaner infousers banner conexao addhost delhost badvpn limiter botssh \
+             senharoot detalhes v2raymanager swapmemory userbackup blockt reiniciarservicos \
+             speedtest slow_dns redmonitor changesshport autobackup reiniciar estadosistema \
+             logsconexion velocidadusuario certssl bandwidth bulkusers expirealert sshkeys \
+             security cronbackup cleanlogs speedhour serverstats dnsmanager bot menu_auth version_control)
+    
+    success=0
+    failed=0
+    failed_list=""
+    
+    for mod in "${modules[@]}"; do
+        if wget -q "$GITHUB_RAW/Modulos/$mod" -O "/tmp/${mod}_new" 2>/dev/null; then
+            if bash -n "/tmp/${mod}_new" 2>/dev/null || [[ "$mod" == "version_control" ]] || [[ "$mod" == "menu_auth" ]]; then
+                cp "/tmp/${mod}_new" "/usr/bin/$mod"
+                chmod 755 "/usr/bin/$mod"
+                ((success++))
+            else
+                ((failed++))
+                failed_list+="$mod "
+            fi
+        else
+            ((failed++))
+            failed_list+="$mod "
+        fi
+        rm -f "/tmp/${mod}_new"
+    done
+    
+    # Update installer
+    if wget -q "$GITHUB_RAW/Plus" -O "/tmp/Plus_new" 2>/dev/null; then
+        cp "/tmp/Plus_new" "/usr/bin/Plus"
+        chmod 755 "/usr/bin/Plus"
+    fi
+    rm -f "/tmp/Plus_new"
+    
+    # Update version file
+    new_version=$(curl -s "https://raw.githubusercontent.com/Netxxus/SSHPLUS/main/VERSION" 2>/dev/null | head -1)
+    [[ -z "$new_version" ]] && new_version=$(date +%Y%m%d)
+    echo "$new_version" > "/etc/SSHPlus/.version"
+    
+    # Reset auth - require password again
+    rm -f "/etc/SSHPlus/.auth" 2>/dev/null
+    rm -f "/etc/SSHPlus/.auth_log" 2>/dev/null
+    
+    local result_msg
+    result_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    result_msg+="<b>ACTUALIZACION COMPLETADA</b>\n"
+    result_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    result_msg+="✅ <b>Mods OK:</b> <code>${success}</code>\n"
+    result_msg+="❌ <b>Fallidos:</b> <code>${failed}</code>\n"
+    result_msg+="🔄 <b>Nueva version:</b> <code>${new_version}</code>\n"
+    result_msg+="🔐 <b>Auth reset:</b> <code>Requiere contrasena</code>\n\n"
+    
+    if [[ -n "$failed_list" ]]; then
+        result_msg+="⚠️ <b>Fallaron:</b> <code>${failed_list}</code>\n\n"
+    fi
+    
+    result_msg+="💡 <i>Escriba /menu para acceder al panel</i>\n"
+    result_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$result_msg")" \
+        --parse_mode html
+    
+    return 0
+}
+# ========== END VERSION & UPDATE ==========
+
 fun_ajuda() {
     [[ ${message_chat_id[$id]} == "" ]] && {
         id_chatuser="${callback_query_message_chat_id[$id]}"
@@ -79,7 +202,9 @@ fun_ajuda() {
         env_msg+="⚠️ <i>Comandos Disponibles</i>\n\n"
         env_msg+="[<b>01</b>] /menu = Exibe menu\n"
         env_msg+="[<b>02</b>] /info = Exibe info\n"
-        env_msg+="[<b>03</b>] /ajuda = info sobre opciones\n\n"
+        env_msg+="[<b>03</b>] /ajuda = info sobre opciones\n"
+        env_msg+="[<b>04</b>] /version = Ver version instalada\n"
+        env_msg+="[<b>05</b>] /update = Actualizar scripts (Owner)\n\n"
         env_msg+="⚠️ <i>Opciones Disponibles</i>\n\n"
         env_msg+="• <u>CREAR USUARIO</u> = Crea usuario ssh\n\n"
         env_msg+="• <u>CREAR TESTE</u> = Crea teste ssh\n\n"
@@ -115,7 +240,8 @@ fun_ajuda() {
         env_msg+="⚠️ <i>Comandos Disponibles</i>\n\n"
         env_msg+="[<b>01</b>] /menu = Exibe menu\n"
         env_msg+="[<b>02</b>] /info = Exibe info\n"
-        env_msg+="[<b>03</b>] /ayuda = info sobre opciones\n\n"
+        env_msg+="[<b>03</b>] /ayuda = info sobre opciones\n"
+        env_msg+="[<b>04</b>] /version = Ver version instalada\n\n"
         env_msg+="⚠️ <i>Opciones Disponibles</i>\n\n"
         env_msg+="• <u>CREAR USUARIO</u> = Crea usuario ssh\n\n"
         env_msg+="• <u>CREAR TESTE</u> = Crea teste ssh\n\n"
@@ -141,7 +267,8 @@ fun_ajuda() {
         env_msg+="⚠️ <i>Comandos Disponibles</i>\n\n"
         env_msg+="[<b>01</b>] /menu = Exibe menu\n"
         env_msg+="[<b>02</b>] /info = Exibe info\n"
-        env_msg+="[<b>03</b>] /ayuda = info sobre opcoes\n\n"
+        env_msg+="[<b>03</b>] /ayuda = info sobre opcoes\n"
+        env_msg+="[<b>04</b>] /version = Ver version instalada\n\n"
         env_msg+="⚠️ <i>Opciones Disponibles</i>\n\n"
         env_msg+="• <u>CREAR USUARIO</u> = Crea usuario ssh\n\n"
         env_msg+="• <u>CREAR TESTE</u> = Crea teste ssh\n\n"
@@ -1891,6 +2018,8 @@ while :; do
                     [[ "${comando[0]}" = "/info" ]] && infouserbot
                     [[ "${comando[0]}" = "/hrlp" || "${comando[0]}" = "/ajuda" ]] && fun_ajuda
                     [[ "${comando[0]}" = "/bot" || "${comando[0]}" = "/sobre" ]] && sobremim
+                    [[ "${comando[0]}" = "/version" ]] && fun_version
+                    [[ "${comando[0]}" = "/update" ]] && fun_update
                     ;;
                 esac
             fi

@@ -43,6 +43,10 @@ IP=$(cat /etc/IP)
 x="ok"
 menu ()
 {
+# Autenticacion
+source /usr/bin/menu_auth 2>/dev/null
+verify_password || exit 1
+
 velocity () {
 espere () {
 comando[0]="$1"
@@ -237,10 +241,12 @@ _onlin=$(printf '%-5s' "$_onli")
 _userexp=$(printf '%-5s' "$_expuser")
 _tuser=$(awk -F: '$3>=1000 {print $1}' /etc/passwd | grep -v nobody | wc -l)
 clear
+_menu_ver="0.0.0"
+[[ -f "/etc/SSHPlus/.version" ]] && _menu_ver=$(cat "/etc/SSHPlus/.version")
 echo -e "\e[0;31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\e[0m"
 echo -e "${rojo}SISTEMA         MEMORIA RAM      PROCESADOR "
 echo -e "${amarillo} $_system   Ram:${verde}$_ram     Cpu: ${amarillo}$_core\e[0m"
-echo -e "${rojo}mod: ${verde}Netxxus🇦🇷   ${verde}$_usor  ${verde}$_usop\e[0m"
+echo -e "${rojo}mod: ${verde}Netxxus🇦🇷 v${_menu_ver}  ${verde}$_usor  ${verde}$_usop\e[0m"
 echo -e "\e[0;31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\e[0m"
 [[ ! -e /tmp/att ]]  && {
     echo -e "${amarillo} Onlines:${verde} $_onlin     ${blanco}Expirados: ${rojo}$_userexp ${amarillo}Total: ${verde}$_tuser\e[0m"
@@ -396,6 +402,9 @@ echo -e "
   ${v}-32-${amarillo}ESTADO SISTEMA        ${v}-36-${amarillo}BOT TELEGRAM $stsbot
   ${v}-33-${amarillo}REINICIAR SISTEMA     ${v}-37-${amarillo}AUTO INICIO $autm
   ${v}-34-${amarillo}ACTUALIZAR SCRIPT     ${v}-38-${amarillo}EDITAR CONTRASEÑA ROOT
+  ${fin}${rojo}━━ SEGURIDAD ━━${fin}
+  ${v}-49-${amarillo}CAMBIAR CONTRASEÑA
+  ${v}-50-${amarillo}CONFIGURAR ACCESO
   ${fin}${rojo}━━ NUEVAS HERRAMIENTAS ━━${fin}
   ${v}-39-${amarillo}ANCHO DE BANDA        ${v}-44-${amarillo}LIMPIAR LOGS
   ${v}-40-${amarillo}USUARIOS EN MASA      ${v}-45-${amarillo}VEL. POR HORA
@@ -618,6 +627,12 @@ case "$x" in
    48)
    clear
    cronbackup
+   ;;
+   49)
+   change_password
+   ;;
+   50)
+   setup_password
    ;;
    0 | 00)
    echo -e "${rojo}@Netxxus\e[0m"

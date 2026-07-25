@@ -20,23 +20,22 @@ if [[ -z "$datauser" || "$datauser" == " never" || "$datauser" == " nunca" ]] 2>
 then
 data="\033[1;33mNunca\033[0m"
 else
-    databr="$(date -d "$datauser" +"%Y%m%d" 2>/dev/null)"
-    hoje="$(date -d today +"%Y%m%d")"
-    if [[ -z "$databr" ]] || [[ "$hoje" -gt "$databr" ]] 2>/dev/null
-    then
-    data="\033[1;31mVencio\033[0m"
+    expire_epoch=$(date -d "$datauser" +%s 2>/dev/null)
+    now_epoch=$(date +%s)
+    diff=$((expire_epoch - now_epoch))
+    if [[ "$diff" -le 0 ]]; then
+        data="\033[1;31mVencio\033[0m"
     else
-   rest_secs=$(( $(date -ud "$datauser" +%s 2>/dev/null) - $(date -ud "$(date +%Y-%m-%d)" +%s 2>/dev/null) ))
-   rest_days=$(( rest_secs / 86400 ))
-   rest_hours=$(( (rest_secs % 86400) / 3600 ))
-   rest_mins=$(( (rest_secs % 3600) / 60 ))
-    if [ $rest_days -gt 0 ]; then
-        data=$(echo -e "${rest_days} \033[1;37mDias\033[0m")
-    elif [ $rest_hours -gt 0 ]; then
-        data=$(echo -e "${rest_hours}h ${rest_mins}m")
-    else
-        data=$(echo -e "${rest_mins} \033[1;37mMin\033[0m")
-    fi
+        rest_days=$((diff / 86400))
+        rest_hours=$(( (diff % 86400) / 3600 ))
+        rest_mins=$(( (diff % 3600) / 60 ))
+        if [ $rest_days -gt 0 ]; then
+            data=$(echo -e "${rest_days} \033[1;37mDias\033[0m")
+        elif [ $rest_hours -gt 0 ]; then
+            data=$(echo -e "${rest_hours}h ${rest_mins}m")
+        else
+            data=$(echo -e "${rest_mins} \033[1;37mMin\033[0m")
+        fi
     fi
 fi
 Usuario=$(printf ' %-15s' "$users")

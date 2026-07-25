@@ -1,0 +1,178 @@
+#!/bin/bash
+AUTH_FILE="/etc/SSHPlus/.auth"
+AUTH_LOG="/etc/SSHPlus/.auth_log"
+VERSION_FILE="/etc/SSHPlus/.version"
+MAX_ATTEMPTS=3
+LOCKOUT_TIME=300
+
+rojo="\033[1;31m"
+verde="\033[1;32m"
+amarillo="\033[1;33m"
+blanco="\033[1;37m"
+fin="\033[0m"
+
+check_lockout() {
+    if [[ -f "$AUTH_LOG" ]]; then
+        last_fail=$(cat "$AUTH_LOG" 2>/dev/null)
+        if [[ -n "$last_fail" ]]; then
+            now=$(date +%s)
+            diff=$((now - last_fail))
+            if [[ $diff -lt $LOCKOUT_TIME ]]; then
+                remaining=$(( (LOCKOUT_TIME - diff) / 60 ))
+                echo -e "${rojo}  BLOQUEADO - Intenta de nuevo en ${remaining} minutos${fin}"
+                return 1
+            fi
+        fi
+    fi
+    return 0
+}
+
+log_failed() {
+    date +%s > "$AUTH_LOG" 2>/dev/null
+}
+
+clear_failed() {
+    rm -f "$AUTH_LOG" 2>/dev/null
+}
+
+setup_password() {
+    clear
+    echo -e "${rojo}═══════════════════════════════════════${fin}"
+    echo -e "${blanco}  CONFIGURAR CONTRASENA SEGURIDAD${fin}"
+    echo -e "${rojo}═══════════════════════════════════════${fin}"
+    echo ""
+    
+    echo -ne "${amarillo}  Nueva contrasena: ${fin}"; read -s pass1
+    echo ""
+    echo -ne "${amarillo}  Confirmar contrasena: ${fin}"; read -s pass2
+    echo ""
+    
+    if [[ "$pass1" != "$pass2" ]]; then
+        echo -e "${rojo}  Las contrasenas no coinciden!${fin}"
+        sleep 2
+        return 1
+    fi
+    
+    if [[ ${#pass1} -lt 4 ]]; then
+        echo -e "${rojo}  Minimo 4 caracteres!${fin}"
+        sleep 2
+        return 1
+    fi
+    
+    pass_hash=$(echo -n "$pass1" | sha256sum | awk '{print $1}')
+    echo "$pass_hash" > "$AUTH_FILE"
+    chmod 600 "$AUTH_FILE"
+    
+    clear_failed
+    echo -e "${verde}  Contrasena configurada correctamente!${fin}"
+    sleep 1
+    return 0
+}
+
+verify_password() {
+    # If no auth file, no password required (first install)
+    if [[ ! -f "$AUTH_FILE" ]]; then
+        return 0
+    fi
+    
+    check_lockout || return 1
+    
+    local current_version="0.0.0"
+    [[ -f "$VERSION_FILE" ]] && current_version=$(cat "$VERSION_FILE")
+    
+    clear
+    echo -e "${rojo}═══════════════════════════════════════${fin}"
+    echo -e "${blanco}  SSHPLUS @Netxxus - v${current_version}${fin}"
+    echo -e "${rojo}═══════════════════════════════════════${fin}"
+    echo ""
+    
+    attempts=0
+    while [[ $attempts -lt $MAX_ATTEMPTS ]]; do
+        echo -ne "${amarillo}  Contrasena: ${fin}"; read -s input_pass
+        echo ""
+        
+        stored_hash=$(cat "$AUTH_FILE" 2>/dev/null)
+        input_hash=$(echo -n "$input_pass" | sha256sum | awk '{print $1}')
+        
+        if [[ "$input_hash" == "$stored_hash" ]]; then
+            clear_failed
+            echo -e "${verde}  Acceso concedido!${fin}"
+            sleep 0.5
+            return 0
+        fi
+        
+        ((attempts++))
+        remaining=$((MAX_ATTEMPTS - attempts))
+        echo -e "${rojo}  Contrasena incorrecta! ($remaining intentos restantes)${fin}"
+    done
+    
+    log_failed
+    echo -e "${rojo}  DEMASIADOS INTENTOS - Bloqueado por $((LOCKOUT_TIME/60)) minutos${fin}"
+    sleep 2
+    return 1
+}
+
+change_password() {
+    clear
+    echo -e "${rojo}═══════════════════════════════════════${fin}"
+    echo -e "${blanco}  CAMBIAR CONTRASENA - @Netxxus${fin}"
+    echo -e "${rojo}═══════════════════════════════════════${fin}"
+    echo ""
+    
+    if [[ -f "$AUTH_FILE" ]]; then
+        echo -ne "${amarillo}  Contrasena actual: ${fin}"; read -s old_pass
+        echo ""
+        
+        old_hash=$(echo -n "$old_pass" | sha256sum | awk '{print $1}')
+        stored_hash=$(cat "$AUTH_FILE" 2>/dev/null)
+        
+        if [[ "$old_hash" != "$stored_hash" ]]; then
+            echo -e "${rojo}  Contrasena actual incorrecta!${fin}"
+            sleep 2
+            return 1
+        fi
+    fi
+    
+    echo -ne "${amarillo}  Nueva contrasena: ${fin}"; read -s new_pass
+    echo ""
+    echo -ne "${amarillo}  Confirmar: ${fin}"; read -s new_pass2
+    echo ""
+    
+    if [[ "$new_pass" != "$new_pass2" ]]; then
+        echo -e "${rojo}  Las contrasenas no coinciden!${fin}"
+        sleep 2
+        return 1
+    fi
+    
+    if [[ ${#new_pass} -lt 4 ]]; then
+        echo -e "${rojo}  Minimo 4 caracteres!${fin}"
+        sleep 2
+        return 1
+    fi
+    
+    pass_hash=$(echo -n "$new_pass" | sha256sum | awk '{print $1}')
+    echo "$pass_hash" > "$AUTH_FILE"
+    chmod 600 "$AUTH_FILE"
+    
+    echo -e "${verde}  Contrasena cambiada!${fin}"
+    sleep 1
+    return 0
+}
+
+remove_password() {
+    rm -f "$AUTH_FILE" "$AUTH_LOG" 2>/dev/null
+    echo -e "${verde}  Contrasena eliminada!${fin}"
+    sleep 1
+}
+
+get_version() {
+    if [[ -f "$VERSION_FILE" ]]; then
+        cat "$VERSION_FILE"
+    else
+        echo "0.0.0"
+    fi
+}
+
+reset_auth() {
+    rm -f "$AUTH_FILE" "$AUTH_LOG" 2>/dev/null
+}
