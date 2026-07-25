@@ -15,13 +15,38 @@ restart_services() {
     service ssh restart > /dev/null 2>&1
     service dropbear restart > /dev/null 2>&1
 }
+default_banner() {
+cat > "$local" << 'BANNER_DEFAULT'
+<strong><p style="text-align: center;"><font color="#6495ed">===</font><font color="#84a6f0">===</font>
+<font color="#9fb7f4">===</font><font color="#b9c8f7">===</font><font color="#d1dafa">===</font>
+<font color="#b9c8f7">===</font><font color="#9fb7f4">===</font><font color="#84a6f0">===</font>
+<font color="#6495ed">===</font>
+<p style="text-align: center;">🔰🇻 🇵 🇸 @ N E T X X U S🔰
+<p style="text-align: center;"><font color="#6495ed">===</font><font color="#84a6f0">===</font>
+<font color="#9fb7f4">===</font><font color="#b9c8f7">===</font><font color="#d1dafa">===</font>
+<font color="#b9c8f7">===</font><font color="#9fb7f4">===</font><font color="#84a6f0">===</font>
+<font color="#6495ed">===</font>
+<p style="text-align: center;"><font color="#228B22"><em>Creado por:</em></font>
+<p style="text-align: center;"><font color="#ff8c00">🔹  NETXXUS</font><font color="#ff9f40"></font>
+<font color="#ffb268"></font><font color="#ffc58d"></font><font color="#ffd8b3"></font>
+<font color="#ffd8b3">『</font><font color="#ffc58d">V</font><font color="#ffb268">P</font>
+<font color="#ff9f40">S</font><font color="#ff8c00">』🔹</font></strong>
+<p style="text-align: center;"><strong><font color="#DC143C">Telegram: </font></strong>t.me/Netxxus
+<strong><p style="text-align: center;"><font color="#6495ed">✓✓</font><font color="#84a6f0">✓✓</font>
+<font color="#9fb7f4">✓✓</font><font color="#b9c8f7">✓✓</font><font color="#d1dafa">✓✓</font>
+<font color="#b9c8f7">✓✓</font><font color="#9fb7f4">✓✓</font><font color="#84a6f0">✓✓</font>
+<font color="#6495ed">✓✓</font>
+</strong>
+BANNER_DEFAULT
+}
 echo -e "\E[44;1;37m         BANNER SSH  @Netxxus           \E[0m"
 echo ""
 echo -e "\033[1;31m[\033[1;36m1\033[1;31m]\033[1;37m • \033[1;33mAGREGAR BANNER (TEXTO SIMPLE)"
-echo -e "\033[1;31m[\033[1;36m2\033[1;31m]\033[1;37m • \033[1;33mAGREGAR BANNER HTML PERSONALIZADO"
-echo -e "\033[1;31m[\033[1;36m3\033[1;31m]\033[1;37m • \033[1;33mVER BANNER ACTUAL"
-echo -e "\033[1;31m[\033[1;36m4\033[1;31m]\033[1;37m • \033[1;33mBORRAR BANNER"
-echo -e "\033[1;31m[\033[1;36m5\033[1;31m]\033[1;37m • \033[1;33mVOLVER"
+echo -e "\033[1;31m[\033[1;36m2\033[1;31m]\033[1;37m • \033[1;33mAGREGAR BANNER HTML (PEGAR CODIGO)"
+echo -e "\033[1;31m[\033[1;36m3\033[1;31m]\033[1;37m • \033[1;33mBANNER DEFAULT @Netxxus"
+echo -e "\033[1;31m[\033[1;36m4\033[1;31m]\033[1;37m • \033[1;33mVER BANNER ACTUAL"
+echo -e "\033[1;31m[\033[1;36m5\033[1;31m]\033[1;37m • \033[1;33mBORRAR BANNER"
+echo -e "\033[1;31m[\033[1;36m6\033[1;31m]\033[1;37m • \033[1;33mVOLVER"
 echo ""
 echo -ne "\033[1;32m OPCION:\033[1;37m "; read resp
 if [[ "$resp" = "1" ]]; then
@@ -84,32 +109,20 @@ elif [[ "$resp" = "2" ]]; then
 	echo -e "\E[44;1;37m       BANNER HTML PERSONALIZADO        \E[0m"
 	echo ""
 	echo -e "\033[1;33mPega tu codigo HTML personalizado abajo.\033[0m"
-	echo -e "\033[1;33mPuede incluir imagenes, estilos, colores, etc.\033[0m"
-	echo -e "\033[1;33mCuando termine, escriba FIN en una linea nueva.\033[0m"
+	echo -e "\033[1;33mPuede ser largo, con imagenes, estilos, colores, etc.\033[0m"
+	echo -e "\033[1;33mEscriba SOLO 'FIN' en una linea nueva cuando termine.\033[0m"
 	echo ""
-	echo -e "\033[1;31mEjemplo de HTML valido:\033[0m"
-	echo -e "\033[1;37m<div style='text-align:center;background:#000;padding:20px'>"
-	echo -e "<h1 style='color:red'>MI BANNER</h1>"
-	echo -e "<p style='color:white'>Bienvenido al servidor</p>"
-	echo -e "</div>\033[0m"
-	echo ""
-	echo -e "\033[1;31m--- INICIO DEL HTML ---\033[0m"
-	> /tmp/banner_tmp.txt
-	while true; do
-		read -r line
-		if [[ "$line" == "FIN" ]]; then
-			break
-		fi
-		echo "$line" >> /tmp/banner_tmp.txt
-	done
+	echo -e "\033[1;31m--- INICIO DEL HTML (pegar aqui) ---\033[0m"
+	cat > /tmp/banner_tmp.txt
 	echo -e "\033[1;31m--- FIN DEL HTML ---\033[0m"
 	echo ""
 	if [[ -s /tmp/banner_tmp.txt ]]; then
-		cat /tmp/banner_tmp.txt > $local
+		cat /tmp/banner_tmp.txt > "$local"
 		rm -f /tmp/banner_tmp.txt
 		restart_services
-		echo -e "\033[1;32mBANNER HTML PERSONALIZADO INSTALADO!\033[0m"
-		echo -e "\033[1;37mArchivo: $local\033[0m"
+		lines=$(wc -l < "$local")
+		echo -e "\033[1;32mBANNER HTML INSTALADO!\033[0m"
+		echo -e "\033[1;37mLineas: $lines | Archivo: $local\033[0m"
 	else
 		rm -f /tmp/banner_tmp.txt
 		echo -e "\033[1;31mCancelado o vacio!\033[0m"
@@ -117,11 +130,16 @@ elif [[ "$resp" = "2" ]]; then
 	sleep 2
 	banner
 elif [[ "$resp" = "3" ]]; then
+	default_banner
+	restart_services
+	echo -e "\n\033[1;32mBANNER DEFAULT @Netxxus INSTALADO!\033[0m"
+	sleep 2
+	banner
+elif [[ "$resp" = "4" ]]; then
 	clear
 	echo -e "\E[44;1;37m         BANNER ACTUAL                  \E[0m"
 	echo ""
 	echo -e "\033[1;33mArchivo: $local\033[0m"
-	echo -e "\033[1;33mContenido:\033[0m"
 	echo -e "\033[1;31m─────────────────────────────────────\033[0m"
 	if [[ -f "$local" ]]; then
 		cat "$local"
@@ -133,13 +151,13 @@ elif [[ "$resp" = "3" ]]; then
 	echo ""
 	echo -ne "\033[1;37m [ENTER] Volver"; read
 	banner
-elif [[ "$resp" = "4" ]]; then
+elif [[ "$resp" = "5" ]]; then
 	echo "" > $local
 	restart_services
 	echo -e "\n\033[1;32mBANNER ELIMINADO!\033[0m"
 	sleep 2
 	banner
-elif [[ "$resp" = "5" ]]; then
+elif [[ "$resp" = "6" ]]; then
 	menu
 else
 	echo -e "\n\033[1;31mOpcion invalida!\033[0m"
