@@ -37,8 +37,9 @@ echo __________________________________ >> /root/banido
 						) &>/dev/null &
 					done <<<"$listpid"
 				}
-			}
-		done <<<"$(awk -F: '$3 >= 1000 {print $1}' /etc/passwd)"
+		}
+		}
+	done <<<"$(awk -F: '$3 >= 1000 {print $1}' /etc/passwd)"
 	) &
 }
 while true; do

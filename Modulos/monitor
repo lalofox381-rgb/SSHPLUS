@@ -23,15 +23,17 @@ get_cpu() {
 
 count_connections() {
     local user="$1"
-    who 2>/dev/null | awk '{print $1}' | grep -c "^${user}$" 2>/dev/null || echo 0
+    ps -u "$user" 2>/dev/null | grep -c "[s]shd" || echo 0
 }
 
 is_active() {
     local user="$1"
-    if who 2>/dev/null | awk '{print $1}' | grep -q "^${user}$"; then
-        echo -e "${GREEN}● ACTIVE${RESET}"
+    local conns=$(ps -u "$user" 2>/dev/null | grep -c "[s]shd" || true)
+    conns=$(echo "$conns" | tr -d '[:space:]')
+    if [[ "$conns" -gt 0 ]] 2>/dev/null; then
+        echo -e "${GREEN}● ONLINE${RESET}"
     else
-        echo -e "${YELLOW}○ IDLE${RESET}"
+        echo -e "${YELLOW}○ OFFLINE${RESET}"
     fi
 }
 
@@ -58,7 +60,7 @@ show_users() {
     print_header
 
     if [[ ! -f "$USERS_DB" ]]; then
-        echo -e "${RED}║  No users database found at: $USERS_DB              ║${RESET}"
+        echo -e "${RED}║  No users database found at: $USERS_DB              ${RED}║${RESET}"
         print_footer
         return
     fi
@@ -66,8 +68,14 @@ show_users() {
     local count=0
     while IFS=' ' read -r username limit; do
         [[ -z "$username" || "$username" == "#"* ]] && continue
-        local conns=$(count_connections "$username")
-        local status=$(is_active "$username")
+        local conns=$(ps -u "$username" 2>/dev/null | grep -c "[s]shd" || true)
+        conns=$(echo "$conns" | tr -d '[:space:]')
+        [[ -z "$conns" || "$conns" == "0" ]] && conns=0
+        if [[ "$conns" -gt 0 ]] 2>/dev/null; then
+            local status="${GREEN}● ONLINE${RESET}"
+        else
+            local status="${YELLOW}○ OFFLINE${RESET}"
+        fi
         printf "${RED}║${WHITE} %-18s${RED} ${status}  ${CYAN}%-10s${RED}║${RESET}\n" "$username" "$conns"
         ((count++))
     done < "$USERS_DB"

@@ -21,9 +21,9 @@ echo -ne "\033[1;33mREINICIANDO OPENSSH "; fun_prog 'service ssh restart'
 echo ""
 sleep 1
 
-# CAMBIO: Ahora reinicia Python3 (matando y relanzando tu script)
-if [[ -e /usr/bin/python3 ]]; then
-echo -ne "\033[1;33mREINICIANDO PYTHON3 "; fun_prog 'pkill -f python3; sleep 1; /usr/bin/python3  &'
+# CAMBIO: Reinicia servicios del autostart
+if [[ -f /etc/autostart ]]; then
+echo -ne "\033[1;33mREINICIANDO SERVICIOS AUTOSTART "; fun_prog 'bash /etc/autostart'
 echo ""
 sleep 1
 fi

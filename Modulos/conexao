@@ -1437,7 +1437,7 @@ unzip ddos.zip
 			}
 
 			[[ "$(netstat -tlpn | grep 'python3' | wc -l)" != '0' ]] && {
-				echo -e "${verde}SERVICIO: ${amarillo}PROXY SOCKS ${verde}PUERTO: ${blanco}$(netstat -nplt | grep 'python3' | awk {'print $4'} | cut -d: -f2 | xargs)"
+				echo -e "${verde}SERVICIO: ${amarillo}PYTHON PROXY ${verde}PUERTO: ${blanco}$(netstat -nplt | grep 'python3' | awk {'print $4'} | cut -d: -f2 | xargs)"
 				sts4="${verde}◉ "
 			} || {
 				sts4="${rojo}○ "
