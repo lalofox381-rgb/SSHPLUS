@@ -326,6 +326,9 @@ do
 [[ $(ps x | grep "limiter" | grep -v grep | wc -l) -gt 0 ]] && stsl="${verde}◉ " || stsl="${rojo}○ "
 [[ $(ps x | grep "python3" | grep -v grep | wc -l) -gt 0 ]] && pyt="${verde}◉ " || pyt="${rojo}○ "
 [[ $(ps x | grep "udpvpn" | grep -v grep | wc -l) -gt 0 ]] && stsu="${verde}◉ " || stsu="${rojo}○ "
+[[ -e /etc/Plus-torrent ]] && stsf="${verde}◉ " || stsf="${rojo}○ "
+[[ $(pgrep -f "bot_plus" | grep -v $$ | wc -l) -gt 0 ]] && stsbot="${verde}◉ " || stsbot="${rojo}○ "
+[[ $(grep -c "menu;" /etc/profile 2>/dev/null) -gt 0 ]] && autm="${verde}◉ " || autm="${rojo}○ "
 if [[ "$(grep -c "Ubuntu" /etc/issue.net)" = "1" ]]; then
 system=$(cut -d' ' -f1 /etc/issue.net)
 system+=$(echo ' ')
@@ -370,23 +373,30 @@ _py_ports=$(netstat -nplt 2>/dev/null | grep 'python3' | awk -F: '{print $4}' | 
 [[ "$(netstat -tunlp 2>/dev/null | grep -c 'v2ray')" != '0' ]] && echo -e "${rojo}V2RAY: ${v}$(netstat -nplt 2>/dev/null | grep 'v2ray' | awk -F ":" '{print $4}' | xargs)"
 echo -e "\e[0;31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\e[0m"
 echo -e "
-  ${v}-01-${amarillo}CREAR USUARIO          ${v}-11- ${amarillo}SPEEDTEST  
-  ${v}-02-${amarillo}MONITOR TRAFICO        ${v}-12- ${amarillo}BANNER ${a}ssh
-  ${v}-03-${amarillo}REMOVER USUARIO        ${v}-13-  ${amarillo}MENU TOKEN 
-  ${v}-04-${amarillo}MONITOR ONLINE         ${v}-14- ${amarillo}PUERTOS ACTIVOS
-  ${v}-05-${amarillo}EDITAR FECHA           ${v}-15- ${amarillo}BACKUP USER  
-  ${v}-06-${amarillo}EDITAR LIMITE          ${v}-16- ${amarillo}Auto PYTHON3 $pyt
-  ${v}-07-${amarillo}EDITAR CONTRASEÑA      ${v}-17- ${amarillo}LIMITER $stsl
-  ${v}-08-${amarillo}BORRAR EXPIRADOS       ${v}-18- ${amarillo}BAD VPN $stsu         
-  ${v}-09-${amarillo}INFO DE  USUARIOS     ${v}-19- ${amarillo}LIMPIAR RAM $stsu   
-  ${v}-10-${amarillo} MENU INSTALADOR      ${v}-20-${amarillo}INFO VPS   ${fin}     
-  ${r}-00-${amarillo}SALIR❌                 ${v}-21-${amarillo}Menu2 
-  ${fin}${rojo}━━ HERRAMIENTAS EXTRA ━━
-  ${v}-41-${amarillo}MONITOR RED            ${v}-45-${amarillo}ESTADO SISTEMA
-  ${v}-42-${amarillo}CAMBIAR PUERTO SSH     ${v}-46-${amarillo}LOGS CONEXION
-  ${v}-43-${amarillo}BACKUP AUTOMATICO      ${v}-47-${amarillo}VEL. POR USUARIO
-  ${v}-44-${amarillo}REINICIAR SERVICIOS    ${v}-48-${amarillo}CERTIFICADO SSL
-  ${fin}${rojo}"
+  ${fin}${rojo}━━ GESTION DE USUARIOS ━━${fin}
+  ${v}-01-${amarillo}CREAR USUARIO          ${v}-05-${amarillo}EDITAR CONTRASEÑA
+  ${v}-02-${amarillo}REMOVER USUARIO        ${v}-06-${amarillo}BORRAR EXPIRADOS
+  ${v}-03-${amarillo}EDITAR FECHA           ${v}-07-${amarillo}INFO DE USUARIOS
+  ${v}-04-${amarillo}EDITAR LIMITE          ${v}-08-${amarillo}MONITOR ONLINE
+  ${fin}${rojo}━━ SERVICIOS ━━${fin}
+  ${v}-09-${amarillo}PUERTO SSH/DROPBEAR    ${v}-14-${amarillo}SLOWDNS
+  ${v}-10-${amarillo}WEBSOCKET $pyt         ${v}-15-${amarillo}BADVPN $stsu
+  ${v}-11-${amarillo}PROXY SOCKS            ${v}-16-${amarillo}UDP
+  ${v}-12-${amarillo}SQUID                  ${v}-17-${amarillo}LIMITER $stsl
+  ${v}-13-${amarillo}SSL TUNNEL             ${v}-18-${amarillo}Auto PYTHON3 $pyt
+  ${fin}${rojo}━━ HERRAMIENTAS ━━${fin}
+  ${v}-19-${amarillo}SPEEDTEST              ${v}-25-${amarillo}INFO VPS
+  ${v}-20-${amarillo}BANNER SSH             ${v}-26-${amarillo}REINICIAR SERVICIOS
+  ${v}-21-${amarillo}BACKUP USER            ${v}-27-${amarillo}CAMBIAR PUERTO SSH
+  ${v}-22-${amarillo}BACKUP AUTOMATICO      ${v}-28-${amarillo}LOGS CONEXION
+  ${v}-23-${amarillo}LIMPIAR RAM            ${v}-29-${amarillo}VEL. POR USUARIO
+  ${v}-24-${amarillo}MONITOR RED            ${v}-30-${amarillo}CERTIFICADO SSL
+  ${fin}${rojo}━━ MENU INSTALADOR ━━${fin}
+  ${v}-31-${amarillo}MENU INSTALADOR       ${v}-35-${amarillo}BLOCK TORRENT $stsf
+  ${v}-32-${amarillo}ESTADO SISTEMA        ${v}-36-${amarillo}BOT TELEGRAM $stsbot
+  ${v}-33-${amarillo}REINICIAR SISTEMA     ${v}-37-${amarillo}AUTO INICIO $autm
+  ${v}-34-${amarillo}ACTUALIZAR SCRIPT     ${v}-38-${amarillo}EDITAR CONTRASEÑA ROOT
+  ${r}-00-${amarillo}SALIR${fin}"
 echo ""
 echo -e "\e[0;31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\e[0m"
 echo ""
@@ -400,134 +410,168 @@ case "$x" in
    ;;
    2 | 02)
    clear
-   monitor
-   echo -ne "\n${rojo} ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
-   ;;
-   3 | 03)
-   clear
    remover
    sleep 3
    ;;
-   4 | 04)
-   clear
-   sshmonitor
-   echo -ne "\n${rojo}Ventas de Droplets : @Netxxus En Telegram\e[0m
-\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
-   ;;      
-   5 | 05)
+   3 | 03)
    clear
    mudardata
    echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
    ;;
-   6 | 06)
+   4 | 04)
    clear
    alterarlimite
    sleep 3
    ;; 
-   7 | 07)
+   5 | 05)
    clear
    alterarsenha
    sleep 3
    ;;
-   8 | 08)
+   6 | 06)
    clear
    expcleaner
    echo ""
    sleep 3
    ;;     
-   9 | 09)
+   7 | 07)
    clear
    infousers
-   echo -ne "\n${rojo}Ventas de Droplets : @Netxxus En Telegram\e[0m
-\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
+   echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
+   ;;
+   8 | 08)
+   clear
+   sshmonitor
+   echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
+   ;;
+   9 | 09)
+   clear
+   conexao
    ;;
    10)
    conexao
    ;;
    11)
-   clear
-   speedtest --simple 2>/dev/null || speedtest-cli --simple 2>/dev/null || echo "Speedtest no disponible"
-   echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
+   conexao
    ;;
    12)
-   clear
-   banner
-   sleep 3
+   conexao
    ;;
    13)
-   clear
-   criarteste
+   conexao
    ;;
    14)
-   clear
-   netstat -ntpl
-    echo -ne "\n${rojo}ENTER ${amarillo}PARA VOLVER AL ${verde}MENU!\e[0m"; read
+   slow_dns
    ;;
    15)
-   userbackup
-   echo -ne "\n${rojo}ENTER ${amarillo}PARA VOLVER al ${verde}MENU!\e[0m"; read
+   clear
+   badvpn
    ;;
    16)
-   ubuntu22
+   conexao
    ;;
    17)
    limit_ssh
    ;;
    18)
-   clear
-   badvpn
-   exit;
+   ubuntu22
    ;;
    19)
-   sync & sysctl -w vm.drop_caches=3
+   clear
+   speedtest --simple 2>/dev/null || speedtest-cli --simple 2>/dev/null || echo "Speedtest no disponible"
+   echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
    ;;
    20)
    clear
-   detalhes
-   echo -ne "\n${rojo}ENTER ${amarillo}PARA VOLVER al ${verde}MENU!\e[0m"; read
+   banner
+   sleep 3
    ;;
    21)
-   menu2
+   userbackup
+   echo -ne "\n${rojo}ENTER ${amarillo}PARA VOLVER al ${verde}MENU!\e[0m"; read
    ;;
-   41)
-   clear
-   /etc/SSHPlus/Modulos/redmonitor
-   echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
-   ;;
-   42)
-   clear
-   /etc/SSHPlus/Modulos/changesshport
-   echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
-   ;;
-   43)
+   22)
    clear
    /etc/SSHPlus/Modulos/autobackup
    echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
    ;;
-   44)
+   23)
+   sync & sysctl -w vm.drop_caches=3
+   ;;
+   24)
+   clear
+   /etc/SSHPlus/Modulos/redmonitor
+   echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
+   ;;
+   25)
+   clear
+   detalhes
+   echo -ne "\n${rojo}ENTER ${amarillo}PARA VOLVER al ${verde}MENU!\e[0m"; read
+   ;;
+   26)
    clear
    /etc/SSHPlus/Modulos/reiniciar
    echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
    ;;
-   45)
+   27)
    clear
-   /etc/SSHPlus/Modulos/estadosistema
+   /etc/SSHPlus/Modulos/changesshport
    echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
    ;;
-   46)
+   28)
    clear
    /etc/SSHPlus/Modulos/logsconexion
    echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
    ;;
-   47)
+   29)
    clear
    /etc/SSHPlus/Modulos/velocidadusuario
    echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
    ;;
-   48)
+   30)
    clear
    /etc/SSHPlus/Modulos/certssl
    echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
+   ;;
+   31)
+   conexao
+   ;;
+   32)
+   clear
+   /etc/SSHPlus/Modulos/estadosistema
+   echo -ne "\n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
+   ;;
+   33)
+   clear
+   reiniciarsistema
+   ;;
+   34)
+   clear
+   attscript
+   ;;
+   35)
+   clear
+   blockt
+   ;;
+   36)
+   clear
+   botssh
+   ;;
+   37)
+   clear
+   [[ $(grep -c "menu;" /etc/profile 2>/dev/null) -gt 0 ]] && {
+       sed -i '/menu;/d' /etc/profile 2>/dev/null
+       echo -e "${rojo}AUTO INICIO DESACTIVADO!\e[0m"
+   } || {
+       echo 'menu;' >> /etc/profile 2>/dev/null
+       echo -e "${verde}AUTO INICIO ACTIVADO!\e[0m"
+   }
+   sleep 2
+   ;;
+   38)
+   clear
+   senharoot
+   sleep 3
    ;;
    0 | 00)
    echo -e "${rojo}@Netxxus\e[0m"
