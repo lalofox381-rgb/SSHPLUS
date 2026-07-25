@@ -22,9 +22,8 @@ tput civis
 echo -ne "  \033[1;31mPROCESANDO, POR FAVOR ESPERE \033[1;37m- \033[1;31m["
 while true; do
 for((i=0; i<18; i++)); do
-meses=(ENERO FEBRERO MARZO ABRIL MAYO JUNIO JULIO AGOSTO SEPTIEMBRE OCTUBRE NOVIEMBRE DICIEMBRE)
-echo -ne " ${meses[$(date +%m)-1]} $(date +%Y) "
-sleep 0.8s
+echo -ne "\033[1;31m#"
+sleep 0.1s
 done
 [[ -e $HOME/fim ]] && rm $HOME/fim && break
 echo -e "\033[1;31m]"
