@@ -25,7 +25,7 @@ installslowdns() {
     [[ "$resp" != @(s|S) ]] && {
         echo -e "\n${RED}Volviendo...${SCOLOR}"
         sleep 2
-        conexao
+        menu
     }
     mkdir /etc/SSHPlus/dns >/dev/null 2>&1
     wget -P $DIR https://github.com/Netxxus/SSHPLUS/raw/main/Install/dns-server >/dev/null 2>&1
@@ -49,7 +49,7 @@ initslow() {
             sed -i '/slow_dns/d' /etc/SSHPlus/dns/autodns >/dev/null 2>&1
             echo -e "\n${RED}SLOWDNS DESACTIVADO!${SCOLOR}"
             sleep 2
-            conexao
+            menu
         elif [[ "$op" == '2' ]]; then
             screen -r -S "slow_dns" -X quit >/dev/null 2>&1
             screen -wipe >/dev/null 2>&1
@@ -57,7 +57,7 @@ initslow() {
             rm -rf /etc/SSHPlus/dns >/dev/null 2>&1
             echo -e "\n${RED}SLOWDNS ELIMINADO!${SCOLOR}"
             sleep 2
-            conexao
+            menu
         elif [[ "$op" == '3' ]]; then
             [[ -e $DIR/server.pub ]] && keypub=$(cat $DIR/server.pub) || keypub='Nulo'
             [[ -e $DIR/autodns ]] && nameserver=$(grep -w 'server.key' /etc/SSHPlus/dns/autodns | awk -F' ' '{print $9}') || nameserver='Nulo'
@@ -69,14 +69,14 @@ initslow() {
             echo -e "\n${GREEN}COMANDO TERMUX${SCOLOR}: ${tmx} ${nameserver} ${keypub}"
             echo -ne "\n${RED}ENTER${YELLOW} para volver al ${GREEN}MENU!${SCOLOR}"
             read
-            conexao
+            menu
         elif [[ "$op" == '0' ]]; then
             sleep 1
-            conexao
+            menu
         else
             echo -e "\n${RED}OPCION INVALIDA${SCOLOR}"
             sleep 1.5
-            conexao
+            menu
         fi
     } || {
         clear
@@ -121,7 +121,7 @@ initslow() {
             }
         elif [[ "$opcc" == '0' ]]; then
             sleep 1.5
-            conexao
+            menu
         else
             echo -e "\n${RED}OPCION INVALIDA${SCOLOR}"
             sleep 1.5
@@ -147,7 +147,7 @@ initslow() {
         echo -e "\n${YELLOW}COMANDO TERMUX${SCOLOR}: ${tmx} ${ns} ${keypub}"
         echo -ne "\n${RED}ENTER${YELLOW} para volver al ${GREEN}MENU!${SCOLOR}"
         read
-        conexao
+        menu
     }
 }
 [[ -d $DIR ]] && {

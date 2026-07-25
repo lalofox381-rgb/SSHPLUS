@@ -4,7 +4,7 @@ if [[ -e /usr/lib/licence ]]; then
 database="/root/usuarios.db"
 tmp_now=$(printf '%(%H%M%S)T\n')
 fun_drop () {
-port_dropbear=`ps aux | grep dropbear | awk NR==1 | awk '{print $17;}'`
+port_dropbear=$(ps aux | grep dropbear | awk 'NR==1{print $17}')
 log=/var/log/auth.log
 loginsukses='Password auth succeeded'
 clear
@@ -54,7 +54,7 @@ echo ""
           ovp=0
         fi
         if netstat -nltp|grep 'dropbear'> /dev/null;then
-          drop="$(fun_drop | grep "$user" | wc -l)"
+          drop="$(fun_drop | grep -w "$user" | wc -l)"
         else
           drop=0
         fi
@@ -63,7 +63,7 @@ echo ""
         if [[ $cnx -gt 0 ]]; then
           tst="$(ps -o etime $(ps -u $user |grep sshd |awk 'NR==1 {print $1}')|awk 'NR==2 {print $1}')"
           tst1=$(echo "$tst" | wc -c)
-        if [[ "$tst1" == "9" ]]; then 
+        if [[ "$tst1" -ge "9" ]]; then
           timerr="$(ps -o etime $(ps -u $user |grep sshd |awk 'NR==1 {print $1}')|awk 'NR==2 {print $1}')"
         else
           timerr="$(echo "00:$tst")"

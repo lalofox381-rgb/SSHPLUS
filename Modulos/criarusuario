@@ -368,11 +368,11 @@ echo "$username $sshlimiter" >>/root/usuarios.db
 			echo -e "\e[1DOK"
 		}
 		aguarde
-		VERSION_ID=$(cat /etc/os-release | grep "VERSION_ID")
+		VERSION_ID=$(grep "VERSION_ID" /etc/os-release | cut -d'"' -f2)
 		echo ""
 		[[ -d /var/www/html/openvpn ]] && {
 			mv $HOME/$username.zip /var/www/html/openvpn/$username.zip >/dev/null 2>&1
-			[[ "$VERSION_ID" = 'VERSION_ID="14.04"' ]] && {
+			[[ "$VERSION_ID" = '14.04' ]] && {
 				echo -e "\033[1;32mLINK\033[1;37m: \033[1;36m$IP:81/html/openvpn/$username.zip"
 			} || {
 				echo -e "\033[1;32mLINK\033[1;37m: \033[1;36m$IP:81/openvpn/$username.zip"

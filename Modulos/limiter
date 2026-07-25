@@ -22,8 +22,9 @@ echo __________________________________ >> /root/banido
 			}
 			[[ -e /etc/openvpn/openvpn-status.log ]] && {
 				ovp="$(grep -E ,"$user", /etc/openvpn/openvpn-status.log | wc -l)"
-				[[ "$ovp" -gt "$limit" ]] && {
-					pidokill=$(($limit - $ovp))
+			[[ "$ovp" -gt "$limit" ]] && {
+				pidokill=$(($ovp - $limit))
+				[[ $pidokill -gt 0 ]] && {
 					listpid=$(grep -E ,"$user", /etc/openvpn/openvpn-status.log | cut -d "," -f3 | head -n $pidokill)
 					while read ovpids; do
 						(

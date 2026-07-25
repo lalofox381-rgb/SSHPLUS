@@ -87,7 +87,8 @@ backbot=$1
 				fun_temp2
 				echo ""
 				if [ -e /var/www/html/backup/backup.vps ]; then
-					if [[ "$VERSION_ID" = 'VERSION_ID="14.04"' ]]; then
+					source /etc/os-release 2>/dev/null
+					if [[ "$VERSION_ID" = '14.04' ]]; then
 						echo -e "\033[1;32mLINK\033[1;37m: \033[1;36m$IP:81/html/backup/backup.vps\033[0m"
 					else
 						echo -e "\033[1;32mLINK\033[1;37m: \033[1;36m$IP:81/backup/backup.vps\033[0m"
@@ -96,7 +97,7 @@ backbot=$1
 					echo -e "\033[1;32mDisponible en\033[1;31m" ~/"backup.vps\033[0m"
 				fi
 			else
-				echo -e "\n\033[1;32mDisponivel em\033[1;31m" ~/"backup.vps\033[0m"
+				echo -e "\n\033[1;32mDisponible en\033[1;31m" ~/"backup.vps\033[0m"
 				sleep 2
 				menu
 			fi

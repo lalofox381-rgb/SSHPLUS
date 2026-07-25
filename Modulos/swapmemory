@@ -29,13 +29,15 @@ fun_swap() {
 			echo -e "\033[1;32mINICIANDO MEMORIA VIRTUAL \033[1;31m$gigas GB\033[1;33m"
 			echo ""
             swapoff -a
-            rm -rf /bin/ram.img > /dev/null 2>&1
-            fallocate -l ${gigas}G /bin/ram.img > /dev/null 2>&1
-            chmod 600 /bin/ram.img > /dev/null 2>&1
-            mkswap /bin/ram.img > /dev/null 2>&1
-            swapon /bin/ram.img > /dev/null 2>&1
+            rm -rf /root/ram.img > /dev/null 2>&1
+            fallocate -l ${gigas}G /root/ram.img > /dev/null 2>&1
+            chmod 600 /root/ram.img > /dev/null 2>&1
+            mkswap /root/ram.img > /dev/null 2>&1
+            swapon /root/ram.img > /dev/null 2>&1
             echo 50  > /proc/sys/vm/swappiness
-            echo '/bin/ram.img none swap sw 0 0' | sudo tee -a /etc/fstab > /dev/null 2>&1
+            grep -v '/root/ram.img' /etc/fstab > /tmp/fstab_tmp 2>/dev/null || true
+            echo '/root/ram.img none swap sw 0 0' >> /tmp/fstab_tmp
+            mv /tmp/fstab_tmp /etc/fstab
             echo ""
 			echo -e "\033[1;32mMEMORIA VIRTUAL ACTIVADA CON EXITO\033[1;33m"
             sleep 2
@@ -44,7 +46,7 @@ fun_swap() {
             clear
 			echo -e "\E[44;1;37m          DESACTIVANDO MEMORIA VIRTUAL              \E[0m"
             swapoff -a
-            rm -rf /bin/ram.img > /dev/null 2>&1
+            rm -rf /root/ram.img > /dev/null 2>&1
             echo ""
 			echo -e "\033[1;32mMEMORIA VIRTUAL DESACTIVADA CON EXITO!\033[1;33m"
 			sleep 2

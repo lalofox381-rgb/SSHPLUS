@@ -21,7 +21,7 @@ fin="\e[0m"   # fin del color
 		comando[1]="$2"
 		(
 			[[ -e $HOME/fim ]] && rm $HOME/fim
-			[[ ! -d /etc/SSHPlus ]] && rm -rf /bin/menu
+			[[ ! -d /etc/SSHPlus ]] && rm -f /bin/menu
 			${comando[0]} >/dev/null 2>&1
 			${comando[1]} >/dev/null 2>&1
 			touch $HOME/fim
@@ -468,8 +468,8 @@ fin="\e[0m"   # fin del color
 				clear
 				fun_conexao
 			} || {
-				echo""
-				echo -e "${rojo}Volviendo...${fin}"
+	echo ""
+	echo -e "${rojo}Volviendo...${fin}"
 				sleep 3
 				clear
 				fun_conexao
@@ -560,9 +560,9 @@ fin="\e[0m"   # fin del color
 				echo -ne "${GREEN}DESEJA CONTINUAR A INSTALACAO ? ${YELLOW}[s/n]:${SCOLOR} "
 				read resp
 				[[ "$resp" != @(s|sim|S|SIM) ]] && {
-					echo -e "\n${RED}Volviendo...${SCOLOR}"
-					sleep 2
-					conexao
+			echo -e "\n${RED}Volviendo...${SCOLOR}"
+			sleep 2
+			menu
 				}
 				echo -e "\n${verde}Suportado Ubuntu 16+${amarillo}"
 				echo -e "\n${verde}INSTALANDO O CHISEL !${amarillo}"
@@ -804,9 +804,9 @@ fin="\e[0m"   # fin del color
 				mv cert cert.pem
 				mv key key.pem
 				mv stunnel stunnel.conf
-				chmod 777 cert.pem
-				chmod 777 key.pem
-				chmod 777 stunnel.conf
+				chmod 600 cert.pem
+				chmod 600 key.pem
+				chmod 644 stunnel.conf
 				service stunnel4 restart
 				cd $HOME
 				clear
@@ -1400,7 +1400,7 @@ unzip ddos.zip
 
 	x="ok"
 	fun_conexao() {
-		while true $x != "ok"; do
+			while true; do
 			[[ ! -e '/home/sshplus' ]] && exit 0
 			clear
 			echo -e "\E[44;1;37m            SSHPLUS 🇦🇷 @Netxxus               ${fin}\n"

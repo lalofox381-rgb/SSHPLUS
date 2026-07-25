@@ -77,7 +77,7 @@ speedtest --share > speed
 echo ""
 echo -e "   ${verde}TESTANDO LA VELOCIDAD Del VPS !\e[0m"
 echo ""
-aguarde 'fun_tst'
+aguarde 'fun_tst' 'sleep 1'
 echo ""
 png=$(cat speed | sed -n '7 p' |awk -F : {'print $NF'})
 down=$(cat speed | sed -n '8 p' |awk -F :  {'print $NF'})
@@ -206,10 +206,10 @@ function autoexec () {
 }
 #menu2
 menu2 (){
-[[ -e /etc/Plus-torrent ]] && stsf=$(echo -e "${verde}◉ ") || stsf=$(echo -e "${rojo}○ ")
-stsbot=$(ps x | grep "bot_plus"|grep -v grep > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
-stsbotteste=$(ps x | grep "bot_teste"|grep -v grep > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
-autm=$(grep "menu;" /etc/profile > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
+[[ -e /etc/Plus-torrent ]] && stsf="${verde}◉ " || stsf="${rojo}○ "
+[[ $(pgrep -f "bot_plus" | grep -v $$ | wc -l) -gt 0 ]] && stsbot="${verde}◉ " || stsbot="${rojo}○ "
+[[ $(pgrep -f "bot_teste" | grep -v $$ | wc -l) -gt 0 ]] && stsbotteste="${verde}◉ " || stsbotteste="${rojo}○ "
+[[ $(grep -c "menu;" /etc/profile 2>/dev/null) -gt 0 ]] && autm="${verde}◉ " || autm="${rojo}○ "
 [[ ! -e /usr/lib/licence ]] && { echo -e "\033[1;31mLicencia no encontrada\033[0m"; sleep 2; exit 1; }
 if [[ "$(grep -c "Ubuntu" /etc/issue.net)" = "1" ]]; then
 system=$(cut -d' ' -f1 /etc/issue.net)
@@ -225,10 +225,10 @@ fi
 _ons=$(ps -x | grep sshd | grep -v root | grep priv | wc -l)
 [[ "$(cat /etc/SSHPlus/Exp)" != "" ]] && _expuser=$(cat /etc/SSHPlus/Exp) || _expuser="0"
 [[ -e /etc/openvpn/openvpn-status.log ]] && _onop=$(grep -c "10.8.0" /etc/openvpn/openvpn-status.log) || _onop="0"
-[[ -e /etc/default/dropbear ]] && _drp=$(ps aux | grep dropbear | grep -v grep | wc -l) _ondrp=$(($_drp - 1)) || _ondrp="0"
+if [[ -e /etc/default/dropbear ]]; then _drp=$(ps aux | grep dropbear | grep -v grep | wc -l); _ondrp=$(($_drp - 1)); [[ $_ondrp -lt 0 ]] && _ondrp=0; else _ondrp="0"; fi
 _onli=$(($_ons + $_onop + $_ondrp))
-_ram=$(printf ' %-9s' "$(free -h | grep -i mem | awk {'print $2'})")
-_usor=$(printf '%-8s' "$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }')")
+_ram=$(printf ' %-9s' "$(free -h | grep -i mem | awk '{print $2}')")
+_usor=$(printf '%-8s' "$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2}')")
 _usop=$(printf '%-1s' "$(top -bn1 | awk '/Cpu/ { cpu = "" 100 - $8 "%" }; END { print cpu }')")
 _core=$(printf '%-1s' "$(grep -c cpu[0-9] /proc/stat)")
 _system=$(printf '%-14s' "$system")
@@ -323,9 +323,9 @@ esac
 }
 while true
 do
-stsl=$(ps x | grep "limiter"|grep -v grep > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
-pyt=$(ps x | grep "python3"|grep -v grep > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
-stsu=$(ps x | grep "udpvpn"|grep -v grep > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
+[[ $(ps x | grep "limiter" | grep -v grep | wc -l) -gt 0 ]] && stsl="${verde}◉ " || stsl="${rojo}○ "
+[[ $(ps x | grep "python3" | grep -v grep | wc -l) -gt 0 ]] && pyt="${verde}◉ " || pyt="${rojo}○ "
+[[ $(ps x | grep "udpvpn" | grep -v grep | wc -l) -gt 0 ]] && stsu="${verde}◉ " || stsu="${rojo}○ "
 if [[ "$(grep -c "Ubuntu" /etc/issue.net)" = "1" ]]; then
 system=$(cut -d' ' -f1 /etc/issue.net)
 system+=$(echo ' ')
@@ -340,17 +340,16 @@ fi
 _ons=$(ps -x | grep sshd | grep -v root | grep priv | wc -l)
 [[ "$(cat /etc/SSHPlus/Exp)" != "" ]] && _expuser=$(cat /etc/SSHPlus/Exp) || _expuser="0"
 [[ -e /etc/openvpn/openvpn-status.log ]] && _onop=$(grep -c "10.8.0" /etc/openvpn/openvpn-status.log) || _onop="0"
-[[ -e /etc/default/dropbear ]] && _drp=$(ps aux | grep dropbear | grep -v grep | wc -l) _ondrp=$(($_drp - 1)) || _ondrp="0"
+if [[ -e /etc/default/dropbear ]]; then _drp=$(ps aux | grep dropbear | grep -v grep | wc -l); _ondrp=$(($_drp - 1)); [[ $_ondrp -lt 0 ]] && _ondrp=0; else _ondrp="0"; fi
 _onli=$(($_ons + $_onop + $_ondrp))
-_ram=$(printf ' %-2s' "$(free -h | grep -i mem | awk {'print $2'})")
-_usor=$(printf '%-2s' "$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }')")
+_ram=$(printf ' %-2s' "$(free -h | grep -i mem | awk '{print $2}')")
+_usor=$(printf '%-2s' "$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2}')")
 usop=$(printf '%-1s' "$(top -bn1 | awk '/Cpu/ { cpu = "" 100 - $8 "%" }; END { print cpu }')")
 _core=$(printf '%-1s' "$(grep -c cpu[0-9] /proc/stat)")
 _system=$(printf '%-14s' "$system")
 _hora=$(printf '%(%H:%M:%S)T')
 _onlin=$(printf '%-3s' "$_onli")
-# O usando vmstat
-CPU_IDLE=$(vmstat 1 2 | tail -1 | awk '{print $15}')
+CPU_IDLE=$(vmstat 1 1 | tail -1 | awk '{print $15}')
 CPU_USAGE=$((100 - CPU_IDLE))
 _userexp=$(printf '%-5s' "$_expuser")
 _tuser=$(awk -F: '$3>=1000 {print $1}' /etc/passwd | grep -v nobody | wc -l)
@@ -434,7 +433,7 @@ case "$x" in
 \n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
    ;;
    10)
-   conexao
+   fun_conexao
    exit;
    ;;
    11)

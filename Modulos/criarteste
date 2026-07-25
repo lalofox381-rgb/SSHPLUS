@@ -222,7 +222,7 @@ Expiration_Display=$(date -u --date="1970-01-01 $Expire_On sec GMT" '+%d %b %Y')
 passwd -u $token
 usermod -e $Expiration $token
 egrep "^$token" /etc/passwd >/dev/null
-echo -e "$PASSWDT\n$PASSWDT\n"|passwd $token &> /dev/null
+echo -e "$(cat $file_pass)\n$(cat $file_pass)\n"|passwd $token &> /dev/null
 clear
 echo -e "$TITLE"
 echo -e "$bar1"
@@ -401,7 +401,7 @@ case "$selection" in
   7)online;;
 	0)cd $HOME && exit 0;;
 	*)
-	echo -e "${rojo} Porfavor seleccione del [0-5]${cierre}"
+	echo -e "${rojo} Por favor seleccione del [0-7]${cierre}"
 	;;
 esac
 }

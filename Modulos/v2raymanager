@@ -146,7 +146,7 @@ msg17='\033[1;37m\033[1;33m(Sin informacion - Para Cancelar Digite CTRL + C)\033
          break
     done
     #Lim
-    [[ $(cat /etc/passwd |grep $1: |grep -vi [a-z]$1 |grep -v [0-9]$1 > /dev/null) ]] && return 1
+    [[ $(cat /etc/passwd |grep "$nick:" |grep -vi "[a-z]$nick" |grep -v "[0-9]$nick" > /dev/null) ]] && return 1
     valid=$(date '+%C%y-%m-%d' -d " +$diasuser days") && datexp=$(date "+%F" -d " + $diasuser days")
     echo -e "\e[91m >> Expira em : \e[92m$datexp "
     ##Registro
@@ -386,7 +386,7 @@ msg17='\033[1;37m\033[1;33m(Sin informacion - Para Cancelar Digite CTRL + C)\033
     sudo iptables -D OUTPUT -p tcp --sport $portbg -m quota --quota $gblim -j ACCEPT
     iptables-save > /etc/iptables/rules.v4
     lineP=$(sed -n '/'${portbg}'/=' /etc/SSHPlus/v2ray/lisportt.log)
-    sed -i "${linePre}d" /etc/SSHPlus/v2ray/lisportt.log
+    sed -i "${lineP}d" /etc/SSHPlus/v2ray/lisportt.log
     echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
     echo -e "\033[1;37m• \033[1;33mEnter Para Continuar\033[1;31m" && read enter
     fun_v2raymanager
@@ -535,7 +535,7 @@ msg17='\033[1;37m\033[1;33m(Sin informacion - Para Cancelar Digite CTRL + C)\033
 				unistallv2
 				;;
             13 | 13)
-				conexao
+				menu
                 exit;
 				;;
 

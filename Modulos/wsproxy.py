@@ -1,18 +1,15 @@
 #!/usr/bin/python3
 import socket, threading, select, sys, getopt, time
 
-# Listen
 LISTENING_ADDR = '0.0.0.0'
-LISTENING_PORT = 80  # Default port 8098
+LISTENING_PORT = 80
 
-# Pass
 PASS = ''
 
-# CONST
 BUFLEN = 4096 * 4
-TIMEOUT = 60
+TIMEOUT = 20
 DEFAULT_HOST = '127.0.0.1:22'
-RESPONSE = 'HTTP/1.1 101 VPS Premium\r\n\r\nContent-Length: 104857600000\r\n\r\n'
+RESPONSE = 'HTTP/1.1 101 Switching Protocols\r\n\r\n'
 
 class Server(threading.Thread):
     def __init__(self, host, port):
@@ -30,7 +27,7 @@ class Server(threading.Thread):
         self.soc.settimeout(2)
         intport = int(self.port)
         self.soc.bind((self.host, intport))
-        self.soc.listen(0)
+        self.soc.listen(5)
         self.running = True
 
         try:
@@ -72,7 +69,6 @@ class Server(threading.Thread):
         try:
             self.running = False
             self.threadsLock.acquire()
-
             threads = list(self.threads)
             for c in threads:
                 c.close()
@@ -88,6 +84,7 @@ class ConnectionHandler(threading.Thread):
         self.client = socClient
         self.client_buffer = b''
         self.server = server
+        self.method = None
         self.log = 'Connection: ' + str(addr)
 
     def close(self):
@@ -95,7 +92,7 @@ class ConnectionHandler(threading.Thread):
             if not self.clientClosed:
                 self.client.shutdown(socket.SHUT_RDWR)
                 self.client.close()
-        except:
+        except Exception:
             pass
         finally:
             self.clientClosed = True
@@ -104,7 +101,7 @@ class ConnectionHandler(threading.Thread):
             if not self.targetClosed:
                 self.target.shutdown(socket.SHUT_RDWR)
                 self.target.close()
-        except:
+        except Exception:
             pass
         finally:
             self.targetClosed = True
@@ -112,6 +109,8 @@ class ConnectionHandler(threading.Thread):
     def run(self):
         try:
             self.client_buffer = self.client.recv(BUFLEN)
+            if not self.client_buffer:
+                return
 
             hostPort = self.findHeader(self.client_buffer, b'X-Real-Host')
 
@@ -125,15 +124,17 @@ class ConnectionHandler(threading.Thread):
 
             if hostPort != b'':
                 passwd = self.findHeader(self.client_buffer, b'X-Pass')
-                
-                if len(PASS) != 0 and passwd == PASS.encode('utf-8'):
-                    self.method_CONNECT(hostPort)
-                elif len(PASS) != 0 and passwd != PASS.encode('utf-8'):
-                    self.client.send(b'HTTP/1.1 400 WrongPass!\r\n\r\n')
-                elif hostPort.startswith(b'127.0.0.1') or hostPort.startswith(b'localhost'):
-                    self.method_CONNECT(hostPort)
-                else:
-                    self.client.send(b'HTTP/1.1 403 Forbidden!\r\n\r\n')
+
+                if len(PASS) != 0:
+                    if passwd == PASS.encode('utf-8'):
+                        self.method_CONNECT(hostPort)
+                    else:
+                        self.client.send(b'HTTP/1.1 400 WrongPass!\r\n\r\n')
+                elif len(PASS) == 0:
+                    if hostPort.startswith(b'127.0.0.1') or hostPort.startswith(b'localhost'):
+                        self.method_CONNECT(hostPort)
+                    else:
+                        self.client.send(b'HTTP/1.1 403 Forbidden!\r\n\r\n')
             else:
                 print('- No X-Real-Host!')
                 self.client.send(b'HTTP/1.1 400 NoXRealHost!\r\n\r\n')
@@ -158,7 +159,7 @@ class ConnectionHandler(threading.Thread):
         if aux == -1:
             return b''
 
-        return head[:aux];
+        return head[:aux]
 
     def connect_target(self, host):
         i = host.find(b':')
@@ -166,7 +167,7 @@ class ConnectionHandler(threading.Thread):
             port = int(host[i+1:])
             host = host[:i]
         else:
-            if self.method=='CONNECT':
+            if self.method == 'CONNECT':
                 port = 443
             else:
                 port = LISTENING_PORT
@@ -178,12 +179,11 @@ class ConnectionHandler(threading.Thread):
         self.target.connect(address)
 
     def method_CONNECT(self, path):
+        self.method = 'CONNECT'
         self.log += ' - CONNECT ' + path.decode('utf-8')
-
         self.connect_target(path)
         self.client.sendall(RESPONSE.encode('utf-8'))
         self.client_buffer = b''
-
         self.server.printLog(self.log)
         self.doCONNECT()
 
@@ -207,11 +207,11 @@ class ConnectionHandler(threading.Thread):
                                 while data:
                                     byte = self.target.send(data)
                                     data = data[byte:]
-
                             count = 0
                         else:
+                            error = True
                             break
-                    except:
+                    except Exception:
                         error = True
                         break
             if count == TIMEOUT:
@@ -221,16 +221,16 @@ class ConnectionHandler(threading.Thread):
 
 
 def print_usage():
-    print('Usage: proxy.py -p <port>')
-    print('       proxy.py -b <bindAddr> -p <port>')
-    print('       proxy.py -b 0.0.0.0 -p 80')
+    print('Usage: wsproxy.py -p <port>')
+    print('       wsproxy.py -b <bindAddr> -p <port>')
+    print('       wsproxy.py -b 0.0.0.0 -p 80')
 
 def parse_args(argv):
     global LISTENING_ADDR
     global LISTENING_PORT
-    
+
     try:
-        opts, args = getopt.getopt(argv,"hb:p:",["bind=","port="])
+        opts, args = getopt.getopt(argv, "hb:p:", ["bind=", "port="])
     except getopt.GetoptError:
         print_usage()
         sys.exit(2)

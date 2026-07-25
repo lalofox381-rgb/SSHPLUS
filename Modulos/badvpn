@@ -57,9 +57,8 @@ fun_badvpn() {
                     sleep 0.1
                 } || {
                     cd $HOME
-                    wget https://www.dropbox.com/s/48b36clnxkkurlz/badvpn-udpgw -o /dev/null
-                    mv -f $HOME/badvpn-udpgw /bin/badvpn-udpgw
-                    chmod 777 /bin/badvpn-udpgw
+                    wget "https://www.dropbox.com/s/48b36clnxkkurlz/badvpn-udpgw?dl=1" -O /bin/badvpn-udpgw -o /dev/null
+                    chmod 755 /bin/badvpn-udpgw
                 }
             }
             echo ""
