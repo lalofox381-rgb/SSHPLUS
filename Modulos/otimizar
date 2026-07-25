@@ -79,7 +79,7 @@ fun_limpram() {
 	swapon -a
 	sleep 4
 }
-function aguarde() {
+function espere() {
 	sleep 1
 	helice() {
 		fun_limpram >/dev/null 2>&1 &
@@ -96,7 +96,7 @@ function aguarde() {
 	helice
 	echo -e "\e[1DOk"
 }
-aguarde
+espere
 sleep 1
 clear
 echo -e "\033[1;32m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"

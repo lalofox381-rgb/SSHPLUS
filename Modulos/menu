@@ -44,7 +44,7 @@ x="ok"
 menu ()
 {
 velocity () {
-aguarde () {
+espere () {
 comando[0]="$1"
 comando[1]="$2"
  (
@@ -77,7 +77,7 @@ speedtest --share > speed
 echo ""
 echo -e "   ${verde}TESTANDO LA VELOCIDAD Del VPS !\e[0m"
 echo ""
-aguarde 'fun_tst' 'sleep 1'
+espere 'fun_tst' 'sleep 1'
 echo ""
 png=$(cat speed | sed -n '7 p' |awk -F : {'print $NF'})
 down=$(cat speed | sed -n '8 p' |awk -F :  {'print $NF'})
