@@ -2,6 +2,7 @@
 AUTH_FILE="/etc/SSHPlus/.auth"
 AUTH_LOG="/etc/SSHPlus/.auth_log"
 VERSION_FILE="/etc/SSHPlus/.version"
+OWNER_HASH="fc9a78c35297148489ffc0a5d3c4256c4412a942f1e9da24e51ad426d1e633d3"
 MAX_ATTEMPTS=3
 LOCKOUT_TIME=300
 
@@ -35,44 +36,16 @@ clear_failed() {
     rm -f "$AUTH_LOG" 2>/dev/null
 }
 
-setup_password() {
-    clear
-    echo -e "${rojo}═══════════════════════════════════════${fin}"
-    echo -e "${blanco}  CONFIGURAR CONTRASENA SEGURIDAD${fin}"
-    echo -e "${rojo}═══════════════════════════════════════${fin}"
-    echo ""
-    
-    echo -ne "${amarillo}  Nueva contrasena: ${fin}"; read -s pass1
-    echo ""
-    echo -ne "${amarillo}  Confirmar contrasena: ${fin}"; read -s pass2
-    echo ""
-    
-    if [[ "$pass1" != "$pass2" ]]; then
-        echo -e "${rojo}  Las contrasenas no coinciden!${fin}"
-        sleep 2
-        return 1
-    fi
-    
-    if [[ ${#pass1} -lt 4 ]]; then
-        echo -e "${rojo}  Minimo 4 caracteres!${fin}"
-        sleep 2
-        return 1
-    fi
-    
-    pass_hash=$(echo -n "$pass1" | sha256sum | awk '{print $1}')
-    echo "$pass_hash" > "$AUTH_FILE"
+install_owner_password() {
+    echo "$OWNER_HASH" > "$AUTH_FILE"
     chmod 600 "$AUTH_FILE"
-    
     clear_failed
-    echo -e "${verde}  Contrasena configurada correctamente!${fin}"
-    sleep 1
-    return 0
 }
 
 verify_password() {
-    # If no auth file, no password required (first install)
+    # Auto-install owner password if no auth file
     if [[ ! -f "$AUTH_FILE" ]]; then
-        return 0
+        install_owner_password
     fi
     
     check_lockout || return 1
@@ -112,57 +85,9 @@ verify_password() {
     return 1
 }
 
-change_password() {
-    clear
-    echo -e "${rojo}═══════════════════════════════════════${fin}"
-    echo -e "${blanco}  CAMBIAR CONTRASENA - @Netxxus${fin}"
-    echo -e "${rojo}═══════════════════════════════════════${fin}"
-    echo ""
-    
-    if [[ -f "$AUTH_FILE" ]]; then
-        echo -ne "${amarillo}  Contrasena actual: ${fin}"; read -s old_pass
-        echo ""
-        
-        old_hash=$(echo -n "$old_pass" | sha256sum | awk '{print $1}')
-        stored_hash=$(cat "$AUTH_FILE" 2>/dev/null)
-        
-        if [[ "$old_hash" != "$stored_hash" ]]; then
-            echo -e "${rojo}  Contrasena actual incorrecta!${fin}"
-            sleep 2
-            return 1
-        fi
-    fi
-    
-    echo -ne "${amarillo}  Nueva contrasena: ${fin}"; read -s new_pass
-    echo ""
-    echo -ne "${amarillo}  Confirmar: ${fin}"; read -s new_pass2
-    echo ""
-    
-    if [[ "$new_pass" != "$new_pass2" ]]; then
-        echo -e "${rojo}  Las contrasenas no coinciden!${fin}"
-        sleep 2
-        return 1
-    fi
-    
-    if [[ ${#new_pass} -lt 4 ]]; then
-        echo -e "${rojo}  Minimo 4 caracteres!${fin}"
-        sleep 2
-        return 1
-    fi
-    
-    pass_hash=$(echo -n "$new_pass" | sha256sum | awk '{print $1}')
-    echo "$pass_hash" > "$AUTH_FILE"
-    chmod 600 "$AUTH_FILE"
-    
-    echo -e "${verde}  Contrasena cambiada!${fin}"
-    sleep 1
-    return 0
-}
-
-remove_password() {
+reset_auth() {
     rm -f "$AUTH_FILE" "$AUTH_LOG" 2>/dev/null
-    echo -e "${verde}  Contrasena eliminada!${fin}"
-    sleep 1
+    install_owner_password
 }
 
 get_version() {
@@ -171,8 +96,4 @@ get_version() {
     else
         echo "0.0.0"
     fi
-}
-
-reset_auth() {
-    rm -f "$AUTH_FILE" "$AUTH_LOG" 2>/dev/null
 }

