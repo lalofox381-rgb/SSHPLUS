@@ -1,0 +1,85 @@
+#!/bin/bash
+clear
+rojo="\033[1;31m"
+verde="\033[1;32m"
+amarillo="\033[1;33m"
+blanco="\033[1;37m"
+fin="\033[0m"
+HOSTS_FILE="/etc/hosts"
+
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo -e "${blanco}  GESTION DE DNS - @Netxxus${fin}"
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo ""
+
+echo -e "${amarillo}  [1]${fin} Ver registros DNS locales"
+echo -e "${amarillo}  [2]${fin} Agregar registro DNS"
+echo -e "${amarillo}  [3]${fin} Eliminar registro DNS"
+echo -e "${amarillo}  [4]${fin} Test de DNS"
+echo -e "${amarillo}  [5]${fin} Cambiar DNS del servidor"
+echo -e "${amarillo}  [0]${fin} Volver"
+echo ""
+echo -ne "${blanco}  Opcion: ${fin}"; read op
+
+case "$op" in
+    1)
+        clear
+        echo -e "${amarillo}  REGISTROS DNS EN /etc/hosts:${fin}"
+        echo -e "${rojo}─────────────────────────────────────────${fin}"
+        grep -v "^#" "$HOSTS_FILE" | grep -v "^$" | while read line; do
+            echo -e "  ${blanco}$line${fin}"
+        done
+        ;;
+    2)
+        echo -e "${amarillo}  IP:${fin} "; read ip
+        echo -e "${amarillo}  DOMINIO:${fin} "; read dominio
+        [[ -z "$ip" || -z "$dominio" ]] && { echo -e "${rojo}  Datos incompletos!${fin}"; sleep 2; exit 1; }
+        
+        echo "$ip $dominio" >> "$HOSTS_FILE"
+        echo -e "${verde}  Registro agregado: $ip $dominio${fin}"
+        ;;
+    3)
+        echo -e "${amarillo}  REGISTROS ACTUALES:${fin}"
+        grep -v "^#" "$HOSTS_FILE" | grep -v "^$" | nl
+        echo ""
+        echo -ne "${rojo}  Numero a ELIMINAR (0=volver): ${fin}"; read num
+        [[ "$num" == "0" ]] && exit 0
+        
+        total=$(grep -cv "^#\|^$" "$HOSTS_FILE")
+        if [[ "$num" -ge 1 && "$num" -le "$total" ]]; then
+            registro=$(grep -v "^#\|^$" "$HOSTS_FILE" | sed -n "${num}p")
+            sed -i "/^$(echo $registro | awk '{print $1}') ${registro#* }/d" "$HOSTS_FILE"
+            echo -e "${verde}  Registro eliminado: $registro${fin}"
+        else
+            echo -e "${rojo}  Numero invalido!${fin}"
+        fi
+        ;;
+    4)
+        echo -e "${amarillo}  DOMINIO A TESTEAR:${fin} "; read dominio
+        [[ -z "$dominio" ]] && exit 1
+        
+        echo -e "${amarillo}  Resolviendo $dominio...${fin}"
+        ping -c 3 "$dominio" 2>/dev/null
+        ;;
+    5)
+        echo -e "${amarillo}  DNS ACTUAL:${fin}"
+        cat /etc/resolv.conf | grep nameserver
+        echo ""
+        echo -e "${amarillo}  NUEVO DNS PRIMARIO:${fin} "; read dns1
+        echo -e "${amarillo}  NUEVO DNS SECUNDARIO:${fin} "; read dns2
+        
+        if [[ -n "$dns1" ]]; then
+            cp /etc/resolv.conf /etc/resolv.conf.bak
+            echo "nameserver $dns1" > /etc/resolv.conf
+            [[ -n "$dns2" ]] && echo "nameserver $dns2" >> /etc/resolv.conf
+            echo -e "${verde}  DNS actualizado!${fin}"
+        fi
+        ;;
+    0)
+        exit 0
+        ;;
+esac
+
+echo ""
+echo -e "${blanco}  [ENTER] Volver${fin}"
+read

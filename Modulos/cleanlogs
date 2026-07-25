@@ -1,0 +1,81 @@
+#!/bin/bash
+clear
+rojo="\033[1;31m"
+verde="\033[1;32m"
+amarillo="\033[1;33m"
+blanco="\033[1;37m"
+fin="\033[0m"
+
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo -e "${blanco}  LIMPIAR LOGS - @Netxxus${fin}"
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo ""
+
+# Espacio antes
+espacio_antes=$(du -sh /var/log 2>/dev/null | awk '{print $1}')
+echo -e "${amarillo}  ESPACIO ACTUAL EN /var/log: ${blanco}$espacio_antes${fin}"
+echo ""
+
+echo -e "${amarillo}  [1]${fin} Limpiar logs viejos (>7 dias)"
+echo -e "${amarillo}  [2]${fin} Limpiar TODOS los logs"
+echo -e "${amarillo}  [3]${fin} Limpiar cache de paquetes"
+echo -e "${amarillo}  [4]${fin} Limpiar /tmp"
+echo -e "${amarillo}  [5]${fin} Limpiar TODO (logs + cache + tmp)"
+echo -e "${amarillo}  [0]${fin} Volver"
+echo ""
+echo -ne "${blanco}  Opcion: ${fin}"; read op
+
+echo ""
+
+case "$op" in
+    1)
+        echo -e "${amarillo}  Limpiando logs viejos...${fin}"
+        find /var/log -name "*.gz" -mtime +7 -delete 2>/dev/null
+        find /var/log -name "*.old" -mtime +7 -delete 2>/dev/null
+        find /var/log -name "*.1" -mtime +7 -delete 2>/dev/null
+        find /var/log -type f -name "*.log" -mtime +7 -exec truncate -s 0 {} \; 2>/dev/null
+        > /var/log/syslog 2>/dev/null
+        > /var/log/auth.log 2>/dev/null
+        > /var/log/kern.log 2>/dev/null
+        echo -e "${verde}  Logs viejos limpiados!${fin}"
+        ;;
+    2)
+        echo -e "${rojo}  ELIMINANDO TODOS LOS LOGS...${fin}"
+        find /var/log -type f -exec truncate -s 0 {} \; 2>/dev/null
+        journalctl --vacuum-time=1s 2>/dev/null
+        echo -e "${verde}  Todos los logs limpiados!${fin}"
+        ;;
+    3)
+        echo -e "${amarillo}  Limpiando cache de paquetes...${fin}"
+        apt-get clean 2>/dev/null
+        apt-get autoremove -y 2>/dev/null
+        echo -e "${verde}  Cache limpiada!${fin}"
+        ;;
+    4)
+        echo -e "${amarillo}  Limpiando /tmp...${fin}"
+        find /tmp -type f -atime +1 -delete 2>/dev/null
+        find /tmp -type d -empty -delete 2>/dev/null
+        echo -e "${verde}  /tmp limpiado!${fin}"
+        ;;
+    5)
+        echo -e "${rojo}  LIMPIEZA COMPLETA...${fin}"
+        find /var/log -name "*.gz" -delete 2>/dev/null
+        find /var/log -name "*.old" -delete 2>/dev/null
+        find /var/log -name "*.1" -delete 2>/dev/null
+        find /var/log -type f -exec truncate -s 0 {} \; 2>/dev/null
+        journalctl --vacuum-time=1s 2>/dev/null
+        apt-get clean 2>/dev/null
+        find /tmp -type f -atime +1 -delete 2>/dev/null
+        echo -e "${verde}  Limpieza completa!${fin}"
+        ;;
+    0)
+        exit 0
+        ;;
+esac
+
+echo ""
+espacio_despues=$(du -sh /var/log 2>/dev/null | awk '{print $1}')
+echo -e "${amarillo}  ESPACIO DESPUES: ${blanco}$espacio_despues${fin}"
+echo ""
+echo -e "${blanco}  [ENTER] Volver${fin}"
+read

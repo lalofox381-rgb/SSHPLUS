@@ -1,0 +1,72 @@
+#!/bin/bash
+clear
+rojo="\033[1;31m"
+verde="\033[1;32m"
+amarillo="\033[1;33m"
+blanco="\033[1;37m"
+cyan="\033[1;36m"
+fin="\033[0m"
+
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo -e "${blanco}  PANEL DE SEGURIDAD - @Netxxus${fin}"
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo ""
+
+# Intentos de login fallidos
+echo -e "${cyan}  INTENTOS DE LOGIN FALLIDOS (ultimas 24h):${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+if [[ -f /var/log/auth.log ]]; then
+    fail_count=$(grep -c "Failed password" /var/log/auth.log 2>/dev/null || echo 0)
+    echo -e "  Total fallidos: ${rojo}$fail_count${fin}"
+    
+    echo ""
+    echo -e "${amarillo}  Top 10 IPs con mas intentos fallidos:${fin}"
+    grep "Failed password" /var/log/auth.log 2>/dev/null | grep -oP 'from \K[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | sort | uniq -c | sort -rn | head -10 | while read count ip; do
+        echo -e "  ${rojo}$ip${fin} - $count intentos"
+    done
+elif [[ -f /var/log/secure ]]; then
+    fail_count=$(grep -c "Failed password" /var/log/secure 2>/dev/null || echo 0)
+    echo -e "  Total fallidos: ${rojo}$fail_count${fin}"
+else
+    echo -e "  ${amarillo}Logs no disponibles${fin}"
+fi
+
+echo ""
+
+# IPs bloqueadas por fail2ban
+echo -e "${cyan}  IPs BLOQUEADAS (fail2ban):${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+if command -v fail2ban-client &>/dev/null; then
+    fail2ban-client status 2>/dev/null | grep "Currently banned" || echo "  fail2ban no activo"
+    banned=$(fail2ban-client status sshd 2>/dev/null | grep "Currently banned" | awk '{print $NF}')
+    if [[ -n "$banned" && "$banned" -gt 0 ]]; then
+        fail2ban-client status sshd 2>/dev/null | grep "Banned IP" | head -10
+    fi
+else
+    echo -e "  ${amarillo}fail2ban no instalado${fin}"
+fi
+
+echo ""
+
+# Puertos abiertos
+echo -e "${cyan}  PUERTOS ABIERTOS:${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+netstat -tlnp 2>/dev/null | grep LISTEN | awk '{print $4, $7}' | while read addr proc; do
+    port=$(echo "$addr" | rev | cut -d: -f1 | rev)
+    echo -e "  ${amarillo}$port${fin} - $proc"
+done
+
+echo ""
+
+# Conexiones activas
+echo -e "${cyan}  CONEXIONES SSH ACTIVAS:${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+who 2>/dev/null | while read line; do
+    user=$(echo "$line" | awk '{print $1}')
+    from=$(echo "$line" | awk '{print $5}' | tr -d '()')
+    echo -e "  ${verde}$user${fin} desde $from"
+done
+
+echo ""
+echo -e "${blanco}  [ENTER] Volver${fin}"
+read

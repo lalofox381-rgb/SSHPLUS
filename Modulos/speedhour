@@ -1,0 +1,94 @@
+#!/bin/bash
+clear
+rojo="\033[1;31m"
+verde="\033[1;32m"
+amarillo="\033[1;33m"
+blanco="\033[1;37m"
+fin="\033[0m"
+SPEED_FILE="/etc/SSHPlus/speed_limit.conf"
+
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo -e "${blanco}  VELOCIDAD POR HORA - @Netxxus${fin}"
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo ""
+
+# Mostrar estado actual
+if [[ -f "$SPEED_FILE" ]]; then
+    echo -e "${amarillo}  REGLA ACTUAL:${fin}"
+    cat "$SPEED_FILE"
+else
+    echo -e "  ${amarillo}No hay reglas de velocidad configuradas${fin}"
+fi
+
+echo ""
+echo -e "${amarillo}  [1]${fin} Limitar velocidad por horario"
+echo -e "${amarillo}  [2]${fin} Eliminar limites"
+echo -e "${amarillo}  [3]${fin} Ver reglas activas"
+echo -e "${amarillo}  [0]${fin} Volver"
+echo ""
+echo -ne "${blanco}  Opcion: ${fin}"; read op
+
+case "$op" in
+    1)
+        echo ""
+        echo -e "${amarillo}  HORA DE INICIO (formato 24h, ej: 22):${fin} "; read hora_inicio
+        echo -e "${amarillo}  HORA DE FIN (formato 24h, ej: 06):${fin} "; read hora_fin
+        echo -e "${amarillo}  VELOCIDAD MAXIMA (en kbit/s, ej: 1024):${fin} "; read velocidad
+        
+        [[ -z "$hora_inicio" || -z "$hora_fin" || -z "$velocidad" ]] && {
+            echo -e "${rojo}  Datos incompletos!${fin}"
+            sleep 2
+            exit 1
+        }
+        
+        echo "# Limite de velocidad por hora" > "$SPEED_FILE"
+        echo "HORA_INICIO=$hora_inicio" >> "$SPEED_FILE"
+        echo "HORA_FIN=$hora_fin" >> "$SPEED_FILE"
+        echo "VELOCIDAD=$velocidad" >> "$SPEED_FILE"
+        
+        # Crear script de aplicacion
+        cat > /usr/bin/apply_speed.sh << 'SEOF'
+#!/bin/bash
+source /etc/SSHPlus/speed_limit.conf
+hora_actual=$(date +%H)
+
+if [[ $hora_actual -ge $HORA_INICIO || $hora_actual -lt $HORA_FIN ]]; then
+    tc qdisc add dev eth0 root tbf rate ${VELOCIDAD}kbit burst 32kbit latency 400ms 2>/dev/null
+else
+    tc qdisc del dev eth0 root 2>/dev/null
+fi
+SEOF
+        chmod 755 /usr/bin/apply_speed.sh
+        
+        # Agregar a cron
+        echo "*/5 * * * * root /usr/bin/apply_speed.sh" > /etc/cron.d/speed_limit
+        chmod 644 /etc/cron.d/speed_limit
+        
+        echo -e "${verde}  Limite de velocidad configurado!${fin}"
+        echo -e "  Horario: ${blanco}$hora_inicio:00 - $hora_fin:00${fin}"
+        echo -e "  Velocidad: ${blanco}$velocidad kbit/s${fin}"
+        ;;
+    2)
+        rm -f "$SPEED_FILE" /etc/cron.d/speed_limit
+        tc qdisc del dev eth0 root 2>/dev/null
+        echo -e "${verde}  Limites de velocidad eliminados!${fin}"
+        ;;
+    3)
+        if [[ -f "$SPEED_FILE" ]]; then
+            echo -e "${amarillo}  REGLAS ACTIVAS:${fin}"
+            cat "$SPEED_FILE"
+            echo ""
+            echo -e "${amarillo}  Estado de tc:${fin}"
+            tc qdisc show dev eth0 2>/dev/null || echo "  Sin limites activos"
+        else
+            echo -e "  ${amarillo}No hay reglas configuradas${fin}"
+        fi
+        ;;
+    0)
+        exit 0
+        ;;
+esac
+
+echo ""
+echo -e "${blanco}  [ENTER] Volver${fin}"
+read

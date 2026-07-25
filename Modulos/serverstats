@@ -1,0 +1,85 @@
+#!/bin/bash
+clear
+rojo="\033[1;31m"
+verde="\033[1;32m"
+amarillo="\033[1;33m"
+blanco="\033[1;37m"
+cyan="\033[1;36m"
+fin="\033[0m"
+
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo -e "${blanco}  ESTADISTICAS DEL SERVIDOR - @Netxxus${fin}"
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo ""
+
+# Sistema
+echo -e "${cyan}  SISTEMA:${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+os=$(cat /etc/issue.net 2>/dev/null || echo "N/A")
+kernel=$(uname -r)
+uptime=$(uptime -p 2>/dev/null || uptime | sed 's/.*up/up/' | sed 's/,.*load.*//')
+echo -e "  OS: ${blanco}$os${fin}"
+echo -e "  Kernel: ${blanco}$kernel${fin}"
+echo -e "  Uptime: ${blanco}$uptime${fin}"
+
+echo ""
+
+# CPU
+echo -e "${cyan}  CPU:${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+cpu_model=$(grep "model name" /proc/cpuinfo | head -1 | awk -F: '{print $2}' | xargs)
+cpu_cores=$(grep -c cpu[0-9] /proc/stat)
+cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}')
+echo -e "  Modelo: ${blanco}$cpu_model${fin}"
+echo -e "  Nucleos: ${blanco}$cpu_cores${fin}"
+echo -e "  Uso: ${blanco}$cpu_usage%${fin}"
+
+echo ""
+
+# RAM
+echo -e "${cyan}  MEMORIA RAM:${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+ram_total=$(free -h | awk '/Mem:/{print $2}')
+ram_used=$(free -h | awk '/Mem:/{print $3}')
+ram_free=$(free -h | awk '/Mem:/{print $4}')
+ram_percent=$(free -m | awk 'NR==2{printf "%.1f", $3*100/$2}')
+echo -e "  Total: ${blanco}$ram_total${fin}"
+echo -e "  En Uso: ${blanco}$ram_used${fin}"
+echo -e "  Libre: ${blanco}$ram_free${fin}"
+echo -e "  Uso: ${blanco}${ram_percent}%${fin}"
+
+echo ""
+
+# Disco
+echo -e "${cyan}  DISCO:${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+df -h / | awk 'NR==2{printf "  Total: %s\n  En Uso: %s\n  Libre: %s\n  Uso: %s\n", $2, $3, $4, $5}'
+
+echo ""
+
+# Red
+echo -e "${cyan}  RED:${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+for iface in $(ls /sys/class/net/ 2>/dev/null | grep -v lo); do
+    rx=$(cat /sys/class/net/$iface/statistics/rx_bytes 2>/dev/null || echo 0)
+    tx=$(cat /sys/class/net/$iface/statistics/tx_bytes 2>/dev/null || echo 0)
+    rx_gb=$(echo "scale=2; $rx/1073741824" | bc 2>/dev/null || echo "0")
+    tx_gb=$(echo "scale=2; $tx/1073741824" | bc 2>/dev/null || echo "0")
+    echo -e "  ${amarillo}$iface${fin}: RX ${blanco}${rx_gb}GB${fin} TX ${blanco}${tx_gb}GB${fin}"
+done
+
+echo ""
+
+# Servicios
+echo -e "${cyan}  SERVICIOS:${fin}"
+echo -e "${rojo}─────────────────────────────────────────${fin}"
+[[ -f /etc/ssh/sshd_config ]] && echo -e "  ${verde}SSH:${fin} Activo"
+[[ -e /etc/default/dropbear ]] && echo -e "  ${verde}DROPBEAR:${fin} Activo"
+netstat -tlnp 2>/dev/null | grep -q "python3" && echo -e "  ${verde}PROXY:${fin} Activo"
+netstat -tlnp 2>/dev/null | grep -q "stunnel4" && echo -e "  ${verde}SSL:${fin} Activo"
+netstat -tlnp 2>/dev/null | grep -q "badvpn" && echo -e "  ${verde}BADVPN:${fin} Activo"
+
+echo ""
+echo -e "${rojo}═══════════════════════════════════════${fin}"
+echo -e "${blanco}  [ENTER] Volver${fin}"
+read

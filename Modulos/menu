@@ -396,6 +396,12 @@ echo -e "
   ${v}-32-${amarillo}ESTADO SISTEMA        ${v}-36-${amarillo}BOT TELEGRAM $stsbot
   ${v}-33-${amarillo}REINICIAR SISTEMA     ${v}-37-${amarillo}AUTO INICIO $autm
   ${v}-34-${amarillo}ACTUALIZAR SCRIPT     ${v}-38-${amarillo}EDITAR CONTRASEÑA ROOT
+  ${fin}${rojo}━━ NUEVAS HERRAMIENTAS ━━${fin}
+  ${v}-39-${amarillo}ANCHO DE BANDA        ${v}-44-${amarillo}LIMPIAR LOGS
+  ${v}-40-${amarillo}USUARIOS EN MASA      ${v}-45-${amarillo}VEL. POR HORA
+  ${v}-41-${amarillo}ALERTA EXPIRACION     ${v}-46-${amarillo}ESTADISTICAS SERVIDOR
+  ${v}-42-${amarillo}LLAVES SSH            ${v}-47-${amarillo}GESTION DNS
+  ${v}-43-${amarillo}PANEL SEGURIDAD       ${v}-48-${amarillo}BACKUP CRON
   ${r}-00-${amarillo}SALIR${fin}"
 echo ""
 echo -e "\e[0;31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\e[0m"
@@ -572,6 +578,46 @@ case "$x" in
    clear
    senharoot
    sleep 3
+   ;;
+   39)
+   clear
+   bandwidth
+   ;;
+   40)
+   clear
+   bulkusers
+   ;;
+   41)
+   clear
+   expirealert
+   ;;
+   42)
+   clear
+   sshkeys
+   ;;
+   43)
+   clear
+   security
+   ;;
+   44)
+   clear
+   cleanlogs
+   ;;
+   45)
+   clear
+   speedhour
+   ;;
+   46)
+   clear
+   serverstats
+   ;;
+   47)
+   clear
+   dnsmanager
+   ;;
+   48)
+   clear
+   cronbackup
    ;;
    0 | 00)
    echo -e "${rojo}@Netxxus\e[0m"
