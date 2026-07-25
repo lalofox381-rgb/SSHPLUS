@@ -433,8 +433,7 @@ case "$x" in
 \n${rojo}ENTER ${amarillo}para VOLVER al ${verde}MENU!\e[0m"; read
    ;;
    10)
-   fun_conexao
-   exit;
+   conexao
    ;;
    11)
    clear
