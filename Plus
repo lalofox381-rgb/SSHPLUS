@@ -22,8 +22,8 @@ tput civis
 echo -ne "  \033[1;31mPROCESANDO, POR FAVOR ESPERE \033[1;37m- \033[1;31m["
 while true; do
 for((i=0; i<18; i++)); do
-echo -ne "\033[1;31m#"
-sleep 0.1s
+echo -ne "\033[1;31m\033[1;33mN\033[1;31mE\033[1;33mT\033[1;31mX\033[1;33mX\033[1;31mX\033[1;33mU\033[1;31mS "
+sleep 0.3s
 done
 [[ -e $HOME/fim ]] && rm $HOME/fim && break
 echo -e "\033[1;31m]"
