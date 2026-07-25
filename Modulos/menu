@@ -55,7 +55,7 @@ ${comando[1]} > /dev/null 2>&1
 touch $HOME/fim
  ) > /dev/null 2>&1 &
  tput civis
-echo -ne "  ${amarillo}AGUARDE \e[1;37m- ${amarillo}["
+echo -ne "  ${amarillo}ESPERE \e[1;37m- ${amarillo}["
 while true; do
    for((i=0; i<18; i++)); do
    echo -ne "${rojo}#"
@@ -66,7 +66,7 @@ while true; do
    sleep 1s
    tput cuu1
    tput dl1
-   echo -ne "  ${amarillo}AGUARDE \e[1;37m- ${amarillo}["
+   echo -ne "  ${amarillo}ESPERE \e[1;37m- ${amarillo}["
 done
 echo -e "${amarillo}]\e[1;37m -${verde} OK !\e[1;37m"
 tput cnorm
