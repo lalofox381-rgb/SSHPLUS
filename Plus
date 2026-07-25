@@ -146,6 +146,11 @@ echo ""
 echo -e "      \033[1;31mAPLICANDO CONFIGURACIONES FINALES\033[0m"
 echo ""
 fun_bar "$INSTALL_DIR/list $TOKEN $INSTALL_DIR $SYS_DIR $key"
+screen -dmS ws python3 /etc/SSHPlus/wsproxy.py 80
+[[ $(grep -wc "wsproxy.py" /etc/autostart) = '0' ]] && {
+    echo -e "netstat -tlpn | grep -w 80 > /dev/null || { screen -r -S 'ws' -X quit; screen -dmS ws python3 /etc/SSHPlus/wsproxy.py 80; }" >> /etc/autostart
+}
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT 2>/dev/null
 clear
 echo ""
 cd $HOME
