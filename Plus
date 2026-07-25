@@ -97,15 +97,15 @@ echo -e "\n\033[1;31m═══════════════════�
 echo ""
 echo -e "                 \033[1;31m• \033[1;31mATENCION \033[1;31m• \033[0m"
 echo ""
-echo -e "\033[1;31mUna base de Datos de Usuários \033[1;37m(usuarios.db) \033[1;31mFue"
-echo -e "Encontrada! Deseja mantenerlos preservando el limite"
-echo -e "de Coneciones simultaneas de usuários ? O Desea"
+echo -e "\033[1;31mUna base de Datos de Usuarios \033[1;37m(usuarios.db) \033[1;31mFue"
+echo -e "Encontrada! Desea mantenerlos preservando el limite"
+echo -e "de Conexiones simultaneas de usuarios ? O Desea"
 echo -e "crear una nueva base de datos ?\033[0m"
-echo -e "\n\033[1;37m[\033[1;31m1\033[1;37m] \033[1;31mManter Base de Datos Actual\033[0m"
+echo -e "\n\033[1;37m[\033[1;31m1\033[1;37m] \033[1;31mMantener Base de Datos Actual\033[0m"
 echo -e "\033[1;37m[\033[1;31m2\033[1;37m] \033[1;31mCrear una Nueva Base de Datos\033[0m"
 echo -e "\n\033[1;31m═════════════════════════════\033[0m"
 echo ""
-tput setaf 1 ; tput bold ; read -p "Opção ?: " -e -i 1 optiondb ; tput sgr0
+tput setaf 1 ; tput bold ; read -p "Opcion ?: " -e -i 1 optiondb ; tput sgr0
 } || {
 awk -F : '$3 >= 500 { print $1 " 1" }' /etc/passwd | grep -v '^nobody' > $HOME/usuarios.db
 }

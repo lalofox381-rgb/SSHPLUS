@@ -823,7 +823,7 @@ fin="\e[0m"   # fin del color
 	}
 
 	fun_openvpn() {
-		rm -rf /root/*   && wget https://raw.githubusercontent.com/Netxxus/SSHPLUS/refs/heads/main/Modulos/ubuntu22.sh && ./ubuntu22.sh
+		wget https://raw.githubusercontent.com/Netxxus/SSHPLUS/refs/heads/main/Modulos/ubuntu22.sh && ./ubuntu22.sh
 		sleep 3
 		fun_conexao
 	}

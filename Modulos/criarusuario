@@ -295,7 +295,7 @@ echo -e "\033[1;37m(Puede dejar en 0 lo que no necesite)\033[0m"
 echo ""
 echo -ne "\033[1;32mDias:\033[1;37m "; read dias
 echo -ne "\033[1;32mHoras:\033[1;37m "; read horas
-echo -ne "\033[1;32]Minutos:\033[1;37m "; read minutos
+echo -ne "\033[1;32mMinutos:\033[1;37m "; read minutos
 dias=${dias:-0}
 horas=${horas:-0}
 minutos=${minutos:-0}
