@@ -55,7 +55,7 @@ verify_password() {
     
     clear
     echo -e "${rojo}═══════════════════════════════════════${fin}"
-    echo -e "${blanco}  SSHPLUS @Netxxus - v${current_version}${fin}"
+    echo -e "${blanco}  PRIVADO VPN @BLACKBOSS_VPN  - v${current_version}${fin}"
     echo -e "${rojo}═══════════════════════════════════════${fin}"
     echo ""
     
