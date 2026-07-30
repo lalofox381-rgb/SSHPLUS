@@ -635,7 +635,7 @@ case "$x" in
    setup_password
    ;;
    0 | 00)
-   echo -e "${rojo}@Netxxus\e[0m"
+   echo -e "${rojo}@BLACKBOSS_VPN\e[0m"
    sleep 2
    clear
    exit;
