@@ -36,14 +36,14 @@ tput cnorm
 
 echo ""
 echo -e "${rojo}═══════════════════════════════════════════════${fin}"
-echo -e "${gris}    @Netxxus SERVER MANAGER${fin}"
+echo -e "${gris}    @BLACKBOSS_VPN SERVER MANAGER${fin}"
 echo -e "${rojo}═══════════════════════════════════════════════${fin}"
 echo ""
 
 fun_atts () {
   [[ -e /home/versao ]] && rm /home/versao
   [[ -e /tmp/att ]] && rm /tmp/att
-  wget -c -P /home https://raw.githubusercontent.com/Netxxus/SSHPLUS/main/Install/versao > /dev/null 2>&1
+  wget -c -P /home https://raw.githubusercontent.com/BLACKBOSS/SSHPLUS/main/Install/versao > /dev/null 2>&1
   [[ -f "/home/versao" ]] && mv /home/versao /tmp/att
 } > /dev/null 2>&1
 
@@ -67,7 +67,7 @@ vrs2=$(sed -n '1 p' /tmp/att 2>/dev/null | sed -e 's/[^0-9]//ig')
     echo -e "${rojo}═══════════════════════════════════════════════${fin}"
     echo ""
     echo -e "  ${gris}Version actual: ${amarillo}${vrs1}${fin}"
-    echo -e "  ${gris}Telegram: ${rojo}@Netxxus${fin}"
+    echo -e "  ${gris}Telegram: ${rojo}@BLACKBOSS_VPN${fin}"
     rm /tmp/att > /dev/null 2>&1
     echo -ne "\n  ${rojo}ENTER ${gris}para volver al ${verde}MENU!${fin}"; read
     menu
@@ -87,7 +87,7 @@ vrs2=$(sed -n '1 p' /tmp/att 2>/dev/null | sed -e 's/[^0-9]//ig')
     done < "/tmp/att"
     echo -e "${rojo}───────────────────────────────────────────────${fin}"
     echo ""
-    echo -e "  ${gris}Telegram: ${rojo}@Netxxus${fin}"
+    echo -e "  ${gris}Telegram: ${rojo}@BLACKBOSS_VPN${fin}"
     echo ""
     echo -ne "  ${amarillo}DESEA ACTUALIZAR? [s/n]: ${fin}"; read res
 
@@ -96,7 +96,7 @@ vrs2=$(sed -n '1 p' /tmp/att 2>/dev/null | sed -e 's/[^0-9]//ig')
         echo -e "${rojo}  INICIANDO ACTUALIZACION...${fin}"
         echo ""
         sleep 2
-        wget -O /tmp/Plus_new https://raw.githubusercontent.com/Netxxus/SSHPLUS/main/Plus > /dev/null 2>&1
+        wget -O /tmp/Plus_new https://raw.githubusercontent.com/BLACKBOSS/SSHPLUS/main/Plus > /dev/null 2>&1
         if [[ -f /tmp/Plus_new ]]; then
             chmod +x /tmp/Plus_new
             /tmp/Plus_new
