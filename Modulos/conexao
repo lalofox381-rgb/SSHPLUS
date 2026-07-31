@@ -1,6 +1,6 @@
 #!/bin/bash
 #====================================================
-#	@Netxxus
+#	BLACKBOSS_VPN X PRIVADO VPN +5493875459547
 #====================================================
 # Definir colores y efectos
 verde="\e[1;32m"  # Cian bold
@@ -10,7 +10,7 @@ rojo="\e[1;31m"  # Rojo bold
 blanco="\e[1;37m"  # Blanco bold
 amarillo="\e[1;33m"  # Amarillo bold
 fin="\e[0m"   # fin del color
-[[ $(awk -F" " '{print $2}' /usr/lib/licence) == "@Netxxus" ]] && {
+[[ $(awk -F" " '{print $2}' /usr/lib/licence) == "@BLACKBOSS_VPN" ]] && {
 	ram1=$(free -h | grep -i mem | awk {'print $2'})
 	ram2=$(free -h | grep -i mem | awk {'print $4'})
 	ram3=$(free -h | grep -i mem | awk {'print $3'})
@@ -62,7 +62,7 @@ fin="\e[0m"   # fin del color
 			slowdns
 		} || {
 			cd $HOME
-			wget https://raw.githubusercontent.com/Netxxus/SSHPLUS/main/Slowdns/install -o /dev/null
+			wget https://raw.githubusercontent.com/BLACKBOSS/SSHPLUS/main/Slowdns/install -o /dev/null
 			chmod 777 install
 			./install
 		}
