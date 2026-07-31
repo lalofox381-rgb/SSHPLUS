@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-echo -e "\E[44;1;37m            INFO DE TU DROPLET                \E[0m"
+echo -e "\E[44;1;37m            INFO DE TU DROPLET🔓               \E[0m"
 echo ""
 if [ -f /etc/lsb-release ]
 then
@@ -16,7 +16,7 @@ if [ -f /etc/os-release ]
 then
 devlike=$(grep LIKE /etc/os-release | awk -F = '{print $2}')
 echo -e "\033[1;33mDerivado de OS: \033[1;37m$devlike"
-echo -e "\033[1;33mVENTA DE DROPLET 🇦🇷: \033[1;37m @Netxxus"
+echo -e "\033[1;33mVENTA DE DROPLET 🇦🇷: \033[1;37m @BLACKBOSS_VPN"
 echo ""
 fi
 else
