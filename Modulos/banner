@@ -17,33 +17,26 @@ restart_services() {
 }
 default_banner() {
 cat > "$local" << 'BANNER_DEFAULT'
-<strong><p style="text-align: center;"><font color="#6495ed">===</font><font color="#84a6f0">===</font>
-<font color="#9fb7f4">===</font><font color="#b9c8f7">===</font><font color="#d1dafa">===</font>
-<font color="#b9c8f7">===</font><font color="#9fb7f4">===</font><font color="#84a6f0">===</font>
-<font color="#6495ed">===</font>
-<p style="text-align: center;">🔰🇻 🇵 🇸 @ N E T X X U S🔰
-<p style="text-align: center;"><font color="#6495ed">===</font><font color="#84a6f0">===</font>
-<font color="#9fb7f4">===</font><font color="#b9c8f7">===</font><font color="#d1dafa">===</font>
-<font color="#b9c8f7">===</font><font color="#9fb7f4">===</font><font color="#84a6f0">===</font>
-<font color="#6495ed">===</font>
-<p style="text-align: center;"><font color="#228B22"><em>Creado por:</em></font>
-<p style="text-align: center;"><font color="#ff8c00">🔹  NETXXUS</font><font color="#ff9f40"></font>
-<font color="#ffb268"></font><font color="#ffc58d"></font><font color="#ffd8b3"></font>
-<font color="#ffd8b3">『</font><font color="#ffc58d">V</font><font color="#ffb268">P</font>
-<font color="#ff9f40">S</font><font color="#ff8c00">』🔹</font></strong>
-<p style="text-align: center;"><strong><font color="#DC143C">Telegram: </font></strong>t.me/Netxxus
-<strong><p style="text-align: center;"><font color="#6495ed">✓✓</font><font color="#84a6f0">✓✓</font>
-<font color="#9fb7f4">✓✓</font><font color="#b9c8f7">✓✓</font><font color="#d1dafa">✓✓</font>
-<font color="#b9c8f7">✓✓</font><font color="#9fb7f4">✓✓</font><font color="#84a6f0">✓✓</font>
-<font color="#6495ed">✓✓</font>
-</strong>
+<div style="text-align:center; line-height:1.0; width:100%;">
+<big><big><big><font color="#5dddff">B</font><font color="#74e8ff">L</font><font color="#d1f3ff">A</font><font color="#ffffff">C</font><font color="#ffffb9">K</font><font color="#fffb2e">B</font><font color="#ffffb9">O</font><font color="#ffffff">S</font><font color="#d1f3ff">S</font><font color="#74e8ff">_</font><font color="#5dddff">V</font><font color="#5dddff">P</font><font color="#5dddff">N</font></big></big></big><br>
+<span style="background-color:#000080; color:#ffffff; padding:1px 6px; font-weight:bold;">🇦🇷 PRIVADO VPN 🇦🇷</span><br>
+<font color="#a7ff00">cómo conectar: (Poner modo avión 30 segundos)</font><br>
+<font color="#00ff41"><big>🔒 NAVEGACIÓNSEGURA 🔒</big></font><br>
+<font color="#fffb2e">SERVIDORES PRIVADOS $8.500</font><br>
+<font color="#00c13f"><big>$ ENLACES $</big></font><br>
+<big>[ <a href="https://chat.whatsapp.com/E8LmjjMRqIWBeGSNfZqHst?s=cl&p=a&ilr=4" style="color:#00ff41; text-decoration:underline;">CLICK AQUI</a> ] ← ← ☆</big><br>
+<font color="#00ff41">grupo de whatsapp link ⇶ [ <a href="https://chat.whatsapp.com/E8LmjjMRqIWBeGSNfZqHst?s=cl&p=a&ilr=4" style="color:#00ff41; text-decoration:underline;">CLICK AQUI</a> ] ← ← ☆</font><br>
+<font color="#018C41">2 0 2 6 versi V.6.9.14 ∆</font><br>
+<font color="#00ff41">ARGENTINA 🇦🇷</font><br>
+<font color="#00ff41"><small>Banner by: @BLACKBOSS_VPN</small></font>
+</div>
 BANNER_DEFAULT
 }
-echo -e "\E[44;1;37m         BANNER SSH  @Netxxus           \E[0m"
+echo -e "\E[44;1;37m         BANNER SSH  @BLACKBOSS_VPN          \E[0m"
 echo ""
 echo -e "\033[1;31m[\033[1;36m1\033[1;31m]\033[1;37m • \033[1;33mAGREGAR BANNER (TEXTO SIMPLE)"
 echo -e "\033[1;31m[\033[1;36m2\033[1;31m]\033[1;37m • \033[1;33mAGREGAR BANNER HTML (PEGAR CODIGO)"
-echo -e "\033[1;31m[\033[1;36m3\033[1;31m]\033[1;37m • \033[1;33mBANNER DEFAULT @Netxxus"
+echo -e "\033[1;31m[\033[1;36m3\033[1;31m]\033[1;37m • \033[1;33mBANNER DEFAULT @BLACKBOSS_VPN"
 echo -e "\033[1;31m[\033[1;36m4\033[1;31m]\033[1;37m • \033[1;33mVER BANNER ACTUAL"
 echo -e "\033[1;31m[\033[1;36m5\033[1;31m]\033[1;37m • \033[1;33mBORRAR BANNER"
 echo -e "\033[1;31m[\033[1;36m6\033[1;31m]\033[1;37m • \033[1;33mVOLVER"
@@ -132,7 +125,7 @@ elif [[ "$resp" = "2" ]]; then
 elif [[ "$resp" = "3" ]]; then
 	default_banner
 	restart_services
-	echo -e "\n\033[1;32mBANNER DEFAULT @Netxxus INSTALADO!\033[0m"
+	echo -e "\n\033[1;32mBANNER DEFAULT @BLACBOSS_VPN INSTALADO!\033[0m"
 	sleep 2
 	banner
 elif [[ "$resp" = "4" ]]; then
